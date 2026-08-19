@@ -1,4 +1,5 @@
 import requests
+import csv
 
 A_CITIES = [
     "Berlin",
@@ -26,17 +27,33 @@ data = requests.get(
     headers={"User-Agent": "Mozilla/5.0"}
 ).json()
 
-for city in A_CITIES:
+filtered = [
+    fair
+    for fair in data
+    if fair.get("strStadt") in A_CITIES
+]
 
-    print("\n" + "=" * 50)
-    print(city)
-    print("=" * 50)
+with open(
+    "a_standorte.csv",
+    "w",
+    newline="",
+    encoding="utf-8"
+) as file:
 
-    fairs = [
-        fair
-        for fair in data
-        if fair.get("strStadt") == city
-    ]
+    writer = csv.DictWriter(
+        file,
+        fieldnames=[
+            "strMesseTerminKey",
+            "strTitel",
+            "strStadt",
+            "strTermin",
+            "strKategorie",
+            "blnFKM",
+            "strUrlParameter"
+        ]
+    )
 
-    for fair in fairs[:10]:
-        print(fair["strTitel"])
+    writer.writeheader()
+    writer.writerows(filtered)
+
+print("Datensätze:", len(filtered))
