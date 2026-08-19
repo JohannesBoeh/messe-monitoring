@@ -1,39 +1,15 @@
 import requests
 import json
 
-url = (
-    "https://www.auma.de/api/TradeFairData/"
-    "getWebOverviewTradeFairData"
-    "?intFilterYearFrom=2026"
-    "&intFilterYearTo=2032"
-    "&intFilterMonthFrom=1"
-    "&intFilterMonthTo=12"
-    "&strLanguage=de"
-)
+BASE_URL = "https://www.auma.de/api/TradeFairData/"
 
-response = requests.get(
-    url,
-    headers={"User-Agent": "Mozilla/5.0"}
-)
+endpoints = [
+    f"getTradeFairData?messeTerminKey=229475",
+    f"getTradeFairData?intMesseTerminKey=229475",
+    f"getTradeFairDetails?messeTerminKey=229475",
+    f"getTradeFairDetails?intMesseTerminKey=229475",
+    f"getWebTradeFairData?messeTerminKey=229475",
+    f"getWebTradeFairData?intMesseTerminKey=229475",
+]
 
-data = response.json()
-
-print("Suche erste FKM-Messe...\n")
-
-found = False
-
-for fair in data:
-
-    if fair.get("blnFKM"):
-
-        print(json.dumps(
-            fair,
-            indent=2,
-            ensure_ascii=False
-        ))
-
-        found = True
-        break
-
-if not found:
-    print("Keine FKM-Messe gefunden.")
+for 
