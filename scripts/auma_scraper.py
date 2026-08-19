@@ -10,16 +10,21 @@ with sync_playwright() as p:
         wait_until="networkidle"
     )
 
-    page.fill("#location-input", "München")
+    print("Buttons auf der Seite:\n")
 
-    page.keyboard.press("Enter")
+    buttons = page.locator("button")
 
-    page.wait_for_timeout(5000)
+    count = buttons.count()
 
-    print("Aktuelle URL:")
-    print(page.url)
+    for i in range(count):
+        try:
+            button = buttons.nth(i)
 
-    print("\nSeitentitel:")
-    print(page.title())
+            print(
+                f"{i}: "
+                f"{button.inner_text()}"
+            )
+        except:
+            pass
 
     browser.close()
