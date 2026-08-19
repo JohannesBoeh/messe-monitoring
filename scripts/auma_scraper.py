@@ -26,12 +26,17 @@ data = requests.get(
     headers={"User-Agent": "Mozilla/5.0"}
 ).json()
 
-print("A-STANDORTE\\n")
-
 for city in A_CITIES:
-    count = sum(
-        1 for fair in data
-        if fair.get("strStadt") == city
-    )
 
-    print(f"{city}: {count}")
+    print("\n" + "=" * 50)
+    print(city)
+    print("=" * 50)
+
+    fairs = [
+        fair
+        for fair in data
+        if fair.get("strStadt") == city
+    ]
+
+    for fair in fairs[:10]:
+        print(fair["strTitel"])
