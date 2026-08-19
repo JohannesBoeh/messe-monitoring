@@ -14,16 +14,8 @@ with sync_playwright() as p:
 
     page.wait_for_timeout(3000)
 
-    print("Überschriften:")
+    content = page.locator("body").inner_text()
 
-    headings = page.locator("h1, h2, h3")
-
-    count = headings.count()
-
-    for i in range(count):
-        try:
-            print(headings.nth(i).inner_text())
-        except:
-            pass
+    print(content[:5000])
 
     browser.close()
