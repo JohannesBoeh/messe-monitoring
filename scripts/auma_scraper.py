@@ -11,11 +11,7 @@ response = requests.get(url, headers=headers)
 
 soup = BeautifulSoup(response.text, "html.parser")
 
-print("Inputs mit Name-Attribut:\n")
+print("JavaScript-Dateien:\n")
 
-for inp in soup.find_all("input"):
-    print("NAME :", inp.get("name"))
-    print("ID   :", inp.get("id"))
-    print("TYPE :", inp.get("type"))
-    print("VALUE:", inp.get("value"))
-    print("-" * 40)
+for script in soup.find_all("script", src=True):
+    print(script["src"])
