@@ -1,2 +1,1 @@
-print("Messe Monitoring läuft")
-``
+print("Python funktioniert!")
