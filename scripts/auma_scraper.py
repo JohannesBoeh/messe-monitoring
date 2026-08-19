@@ -18,11 +18,12 @@ with sync_playwright() as p:
 
     headings = page.locator("h1, h2, h3")
 
-    for i in range(headings.count()):
+    count = headings.count()
+
+    for i in range(count):
         try:
             print(headings.nth(i).inner_text())
         except:
             pass
 
     browser.close()
-`
