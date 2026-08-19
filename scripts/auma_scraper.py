@@ -10,26 +10,9 @@ with sync_playwright() as p:
         wait_until="networkidle"
     )
 
-    print("Seitentitel:")
-    print(page.title())
+    page.fill("#location-input", "München")
 
-    print("\nAlle Input-Felder:")
-
-    inputs = page.locator("input")
-
-    count = inputs.count()
-
-    for i in range(count):
-        try:
-            field = inputs.nth(i)
-
-            print(
-                f"{i}: "
-                f"id={field.get_attribute('id')} "
-                f"name={field.get_attribute('name')} "
-                f"placeholder={field.get_attribute('placeholder')}"
-            )
-        except:
-            pass
+    print("Wert im Ortsfeld:")
+    print(page.input_value("#location-input"))
 
     browser.close()
