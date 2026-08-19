@@ -3,14 +3,8 @@ from playwright.sync_api import sync_playwright
 def log_response(response):
     url = response.url
 
-    if any(x in url.lower() for x in [
-        "search",
-        "messe",
-        "fair",
-        "api",
-        "ajax",
-        "filter"
-    ]):
+    if "/api/TradeFairData/" in url:
+        print("API:")
         print(url)
 
 with sync_playwright() as p:
@@ -33,6 +27,6 @@ with sync_playwright() as p:
     page.keyboard.press("ArrowDown")
     page.keyboard.press("Enter")
 
-    page.wait_for_timeout(5000)
+    page.wait_for_timeout(8000)
 
     browser.close()
