@@ -9,9 +9,12 @@ headers = {
 
 response = requests.get(url, headers=headers)
 
-print(f"Status Code: {response.status_code}")
-
 soup = BeautifulSoup(response.text, "html.parser")
 
-print("\nTitel der Seite:")
-print(soup.title.text)
+print("Links auf der Startseite:\n")
+
+for link in soup.find_all("a", href=True):
+    text = link.get_text(strip=True)
+
+    if text:
+        print(text)
