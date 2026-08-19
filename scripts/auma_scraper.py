@@ -21,19 +21,21 @@ with sync_playwright() as p:
 
     page.wait_for_timeout(2000)
 
-    print("Klicke Ergebnisse anzeigen...")
+    print("Suche nach 'Ergebnisse anzeigen'...")
 
-    page.locator("button").nth(25).click(force=True)
+    buttons = page.locator("button")
 
-    page.wait_for_timeout(5000)
+    count = buttons.count()
 
-    print("\nURL:")
-    print(page.url)
+    for i in range(count):
+        try:
+            text = buttons.nth(i).inner_text().strip()
 
-    print("\nERSTE 3000 ZEICHEN:\n")
-
-    body = page.locator("body").inner_text()
-
-    print(body[:3000])
+            if "Ergebnisse anzeigen" in text:
+                print("GEFUNDEN:")
+                print("Index:", i)
+                print("Text :", text)
+        except:
+            pass
 
     browser.close()
