@@ -15,16 +15,9 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install requests
-
-      - name: Install dependencies
-       run: |
-      	pip install requests beautifulsoup4 playwright
-        playwright install chromium
-
-        
-      - name: Install dependencies
-        run: pip install requests beautifulsoup4
+        run: |
+          pip install requests beautifulsoup4 playwright
+          python -m playwright install chromium
 
       - name: Run scraper
         run: python scripts/auma_scraper.py
