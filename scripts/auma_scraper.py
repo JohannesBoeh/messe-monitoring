@@ -11,6 +11,7 @@ endpoints = [
 ]
 
 for endpoint in endpoints:
+
     url = (
         base_url
         + endpoint
@@ -22,10 +23,20 @@ for endpoint in endpoints:
     )
 
     try:
+
         response = requests.get(
             url,
             headers={"User-Agent": "Mozilla/5.0"},
             timeout=30
         )
 
-        print("\n====
+        print("\n===================================")
+        print(endpoint)
+        print("Status:", response.status_code)
+        print(response.text[:500])
+        print("===================================\n")
+
+    except Exception as e:
+
+        print(endpoint)
+        print("ERROR:", e)
