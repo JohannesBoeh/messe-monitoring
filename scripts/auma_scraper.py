@@ -10,19 +10,25 @@ with sync_playwright() as p:
         wait_until="networkidle"
     )
 
-    page.fill("#location-input", "München")
+    page.click("#location-input")
 
-    page.wait_for_timeout(3000)
+    page.fill("#location-input", "Mün")
 
-    print("Location Field:")
-    print(page.input_value("#location-input"))
+    page.wait_for_timeout(5000)
 
-    print("\nAria Controls:")
+    print("aria-expanded:")
+    print(
+        page.locator("#location-input")
+        .get_attribute("aria-expanded")
+    )
 
-    element = page.locator("#location-input")
+    print("\nBody-Auszug:")
 
-    print("aria-controls =", element.get_attribute("aria-controls"))
-    print("aria-expanded =", element.get_attribute("aria-expanded"))
-    print("role =", element.get_attribute("role"))
+    body = page.locator("body").inner_text()
+
+    if "München" in body:
+        print("München gefunden!")
+    else:
+        print("München nicht gefunden!")
 
     browser.close()
