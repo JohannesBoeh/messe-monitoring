@@ -1,4 +1,5 @@
 from playwright.sync_api import sync_playwright
+import re
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
@@ -13,22 +14,18 @@ with sync_playwright() as p:
     page.click("#location-input")
     page.fill("#location-input", "Mün")
 
-    page.wait_for_timeout(3000)
+    page.wait_for_timeout(2000)
 
-    # Ersten Vorschlag auswählen (München)
     page.keyboard.press("ArrowDown")
     page.keyboard.press("Enter")
 
-    page.wait_for_timeout(2000)
-
-    print("Ausgewählter Wert:")
-    print(page.input_value("#location-input"))
+    page.wait_for_timeout(3000)
 
     body = page.locator("body").inner_text()
 
-    if "7261" in body:
-        print("Noch alle Messen")
-    else:
-        print("Filter scheint aktiv")
+    matches = re.findall(r'(\\d+)\\s+Messen gefunden', body)
 
-    browser.close()
+    if matches:
+        print("Trefferzahl:", matches[0])
+    else:
+        
