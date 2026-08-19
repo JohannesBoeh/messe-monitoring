@@ -20,17 +20,15 @@ with sync_playwright() as p:
 
     page.wait_for_timeout(3000)
 
-    print("Buttons mit 'Ergebnisse':")
+    print("Aktive Filter:")
 
-    buttons = page.locator("button")
+    for text in page.locator("body").inner_text().splitlines():
+        text = text.strip()
 
-    for i in range(buttons.count()):
-        try:
-            text = buttons.nth(i).inner_text().strip()
+        if "München" in text:
+            print(text)
 
-            if "Ergebnisse" in text:
-                print(f"{i}: {text}")
-        except:
-            pass
+    print("\nURL:")
+    print(page.url)
 
     browser.close()
