@@ -1,16 +1,5 @@
 import requests
-import csv
-
-A_CITIES = [
-    "Berlin",
-    "Düsseldorf",
-    "Frankfurt",
-    "Hamburg",
-    "Köln",
-    "Leipzig",
-    "München",
-    "Stuttgart"
-]
+import json
 
 url = (
     "https://www.auma.de/api/TradeFairData/"
@@ -29,55 +18,22 @@ response = requests.get(
 
 data = response.json()
 
-filtered = [
-    fair
-    for fair in data
-    if fair.get("strStadt") in A_CITIES
-]
+print("Suche erste FKM-Messe...\n")
 
-rows = []
+found = False
 
-for fair in filtered:
-    rows.append({
-        "MesseID": fair.get("strMesseTerminKey"),
-        "MesseName": fair.get("strTitel"),
-        "Stadt": fair.get("strStadt"),
-        "Land": fair.get("strLand"),
-        "Termin": fair.get("strTermin"),
-        "Kategorie": fair.get("strKategorie"),
-        "FKM": fair.get("blnFKM"),
-        "UrlParameter": fair.get("strUrlParameter")
-    })
+for fair in data:
 
-with open(
-    "a_standorte.csv",
-    "w",
-    newline="",
-    encoding="utf-8"
-) as file:
+    if fair.get("blnFKM"):
 
-    writer = csv.DictWriter(
-        file,
-        fieldnames=[
-            "MesseID",
-            "MesseName",
-            "Stadt",
-            "Land",
-            "Termin",
-            "Kategorie",
-            "FKM",
-            "UrlParameter"
-        ]
-    )
+        print(json.dumps(
+            fair,
+            indent=2,
+            ensure_ascii=False
+        ))
 
-    writer.writeheader()
-    writer.writerows(rows)
+        found = True
+        break
 
-print("Datensätze exportiert:", len(rows))
-
-for row in rows[:10]:
-    print(
-        row["Stadt"],
-        "-",
-        row["MesseName"]
-    )
+if not found:
+    print("Keine FKM-Messe gefunden.")
