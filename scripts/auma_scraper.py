@@ -11,24 +11,16 @@ with sync_playwright() as p:
     )
 
     page.click("#location-input")
-
     page.fill("#location-input", "Mün")
 
-    page.wait_for_timeout(5000)
+    page.wait_for_timeout(3000)
 
-    print("aria-expanded:")
-    print(
-        page.locator("#location-input")
-        .get_attribute("aria-expanded")
-    )
-
-    print("\nBody-Auszug:")
+    print("Autocomplete Inhalte:")
 
     body = page.locator("body").inner_text()
 
-    if "München" in body:
-        print("München gefunden!")
-    else:
-        print("München nicht gefunden!")
+    for line in body.splitlines():
+        if "Mün" in line:
+            print(line)
 
     browser.close()
