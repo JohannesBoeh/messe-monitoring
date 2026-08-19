@@ -1,23 +1,31 @@
 import requests
 
-url = (
-    "https://www.auma.de/api/TradeFairData/"
-    "getWebOverviewTradeFairDataCount"
-    "?intFilterYearFrom=2026"
-    "&intFilterYearTo=2032"
-    "&intFilterMonthFrom=1"
-    "&intFilterMonthTo=12"
-    "&strLanguage=de"
-)
+base_url = "https://www.auma.de/api/TradeFairData/"
 
-headers = {
-    "User-Agent": "Mozilla/5.0"
-}
+endpoints = [
+    "getWebOverviewTradeFairData",
+    "getWebOverviewTradeFairDataList",
+    "getTradeFairData",
+    "getTradeFairDetails",
+    "getTradeFair",
+]
 
-response = requests.get(url, headers=headers)
+for endpoint in endpoints:
+    url = (
+        base_url
+        + endpoint
+        + "?intFilterYearFrom=2026"
+        + "&intFilterYearTo=2032"
+        + "&intFilterMonthFrom=1"
+        + "&intFilterMonthTo=12"
+        + "&strLanguage=de"
+    )
 
-print("Status:")
-print(response.status_code)
+    try:
+        response = requests.get(
+            url,
+            headers={"User-Agent": "Mozilla/5.0"},
+            timeout=30
+        )
 
-print("\nResponse:")
-print(response.text)
+        print("\n====
