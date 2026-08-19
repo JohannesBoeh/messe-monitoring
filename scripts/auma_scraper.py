@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-url = "https://www.auma.de"
+url = "https://www.auma.de/messen-finden/"
 
 headers = {
     "User-Agent": "Mozilla/5.0"
@@ -9,14 +9,14 @@ headers = {
 
 response = requests.get(url, headers=headers)
 
+print(f"Status Code: {response.status_code}")
+
 soup = BeautifulSoup(response.text, "html.parser")
 
-print("Links mit URL:\n")
+print("\nSeitentitel:")
+print(soup.title.text)
 
-for link in soup.find_all("a", href=True):
-    text = link.get_text(strip=True)
+print("\nErste 20 Formularelemente:")
 
-    if "Messen finden" in text:
-        print("TEXT:", text)
-        print("URL :", link["href"])
-        print("-" * 50)
+for tag in soup.find_all(["input", "select"])[0:20]:
+    print(tag)
