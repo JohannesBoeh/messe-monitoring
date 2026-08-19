@@ -24,7 +24,9 @@ with sync_playwright() as p:
 
     print("BUTTONS:\n")
 
-    for i in range(buttons.count()):
+    count = buttons.count()
+
+    for i in range(count):
         try:
             btn = buttons.nth(i)
 
@@ -35,4 +37,9 @@ with sync_playwright() as p:
                 "|",
                 btn.get_attribute("aria-controls"),
                 "|",
-                btn.get_attribute("
+                btn.get_attribute("type")
+            )
+        except:
+            pass
+
+    browser.close()
