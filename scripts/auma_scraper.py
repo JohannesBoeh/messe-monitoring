@@ -14,20 +14,18 @@ with sync_playwright() as p:
 
     page.wait_for_timeout(3000)
 
-    print("Wert:")
-    print(page.input_value("#location-input"))
+    print("Autocomplete-Einträge:")
 
-    print("\nAnzahl Ergebnisse anzeigen:")
+    options = page.locator("li")
 
-    buttons = page.locator("button")
+    count = min(options.count(), 50)
 
-    for i in range(buttons.count()):
+    for i in range(count):
         try:
-            text = buttons.nth(i).inner_text().strip()
+            text = options.nth(i).inner_text().strip()
 
-            if "Ergebnisse" in text:
+            if text:
                 print(i, text)
-
         except:
             pass
 
