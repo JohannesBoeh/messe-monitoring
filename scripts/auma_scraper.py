@@ -1,7 +1,6 @@
 import requests
-from bs4 import BeautifulSoup
 
-url = "https://www.auma.de/messen-finden/"
+url = "https://www.auma.de/_assets/743126a2ee7e65eef5e1c170709da15d/dist/js/init.min.js"
 
 headers = {
     "User-Agent": "Mozilla/5.0"
@@ -9,9 +8,5 @@ headers = {
 
 response = requests.get(url, headers=headers)
 
-soup = BeautifulSoup(response.text, "html.parser")
-
-print("JavaScript-Dateien:\n")
-
-for script in soup.find_all("script", src=True):
-    print(script["src"])
+print(f"Status: {response.status_code}")
+print(response.text[:3000])
