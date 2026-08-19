@@ -1,6 +1,5 @@
 import requests
-
-print("Lade AUMA Startseite...")
+from bs4 import BeautifulSoup
 
 url = "https://www.auma.de"
 
@@ -10,7 +9,9 @@ headers = {
 
 response = requests.get(url, headers=headers)
 
-with open("output/auma_homepage.html", "w", encoding="utf-8") as f:
-    f.write(response.text)
+print(f"Status Code: {response.status_code}")
 
-print("Datei gespeichert.")
+soup = BeautifulSoup(response.text, "html.parser")
+
+print("\nTitel der Seite:")
+print(soup.title.text)
