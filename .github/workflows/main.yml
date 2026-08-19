@@ -19,3 +19,6 @@ jobs:
 
       - name: Run scraper
         run: python scripts/auma_scraper.py
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
