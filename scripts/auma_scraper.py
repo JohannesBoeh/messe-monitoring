@@ -15,12 +15,20 @@ with sync_playwright() as p:
 
     page.wait_for_timeout(3000)
 
-    print("Autocomplete Inhalte:")
+    # Ersten Vorschlag auswählen (München)
+    page.keyboard.press("ArrowDown")
+    page.keyboard.press("Enter")
+
+    page.wait_for_timeout(2000)
+
+    print("Ausgewählter Wert:")
+    print(page.input_value("#location-input"))
 
     body = page.locator("body").inner_text()
 
-    for line in body.splitlines():
-        if "Mün" in line:
-            print(line)
+    if "7261" in body:
+        print("Noch alle Messen")
+    else:
+        print("Filter scheint aktiv")
 
     browser.close()
