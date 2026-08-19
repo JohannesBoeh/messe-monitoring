@@ -1,4 +1,5 @@
 from cities import CITIES
+import csv
 
 print("Starte AUMA-Scraper...\n")
 
@@ -12,4 +13,13 @@ for item in CITIES:
 
     all_messen.append(messe)
 
-print(all_messen)
+with open("output/raw_auma.csv", "w", newline="", encoding="utf-8") as file:
+    writer = csv.DictWriter(
+        file,
+        fieldnames=["stadt", "standortklasse"]
+    )
+
+    writer.writeheader()
+    writer.writerows(all_messen)
+
+print("CSV erfolgreich erstellt.")
