@@ -12,7 +12,14 @@ with sync_playwright() as p:
 
     page.fill("#location-input", "München")
 
-    print("Wert im Ortsfeld:")
-    print(page.input_value("#location-input"))
+    page.keyboard.press("Enter")
+
+    page.wait_for_timeout(5000)
+
+    print("Aktuelle URL:")
+    print(page.url)
+
+    print("\nSeitentitel:")
+    print(page.title())
 
     browser.close()
