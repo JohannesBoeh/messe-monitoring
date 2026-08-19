@@ -18,7 +18,9 @@ response = requests.get(
 
 data = response.json()
 
-print("Verfügbare Felder:\n")
+print("ANZAHL:")
+print(len(data))
 
-for key in data[0].keys():
-    print(key)
+print("\nERSTER DATENSATZ:\n")
+
+print(json.dumps(data[0], indent=2, ensure_ascii=False))
