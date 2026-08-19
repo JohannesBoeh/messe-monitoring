@@ -1,5 +1,4 @@
 from playwright.sync_api import sync_playwright
-import re
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
@@ -21,13 +20,14 @@ with sync_playwright() as p:
 
     page.wait_for_timeout(3000)
 
-    body = page.locator("body").inner_text()
+    text = page.locator("body").inner_text()
 
-    matches = re.findall(r"(\\d+)\\s+Messen gefunden", body)
+    lines = text.splitlines()
 
-    if matches:
-        print("Trefferzahl:", matches[0])
-    else:
-        print("Keine Trefferzahl gefunden")
+    print("ERGEBNISSE:")
+
+    for line in lines:
+        if "München" in line:
+            print(line)
 
     browser.close()
