@@ -23,9 +23,11 @@ with sync_playwright() as p:
 
     body = page.locator("body").inner_text()
 
-    matches = re.findall(r'(\\d+)\\s+Messen gefunden', body)
+    matches = re.findall(r"(\\d+)\\s+Messen gefunden", body)
 
     if matches:
         print("Trefferzahl:", matches[0])
     else:
-        
+        print("Keine Trefferzahl gefunden")
+
+    browser.close()
