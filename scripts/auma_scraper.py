@@ -14,8 +14,21 @@ with sync_playwright() as p:
 
     page.wait_for_timeout(3000)
 
-    content = page.locator("body").inner_text()
+    print("Wert:")
+    print(page.input_value("#location-input"))
 
-    print(content[:5000])
+    print("\nAnzahl Ergebnisse anzeigen:")
+
+    buttons = page.locator("button")
+
+    for i in range(buttons.count()):
+        try:
+            text = buttons.nth(i).inner_text().strip()
+
+            if "Ergebnisse" in text:
+                print(i, text)
+
+        except:
+            pass
 
     browser.close()
