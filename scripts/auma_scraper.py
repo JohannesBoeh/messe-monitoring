@@ -1,12 +1,15 @@
-import requests
+from playwright.sync_api import sync_playwright
 
-url = "https://www.auma.de/_assets/743126a2ee7e65eef5e1c170709da15d/dist/js/init.min.js"
+print("Starte Browser...")
 
-headers = {
-    "User-Agent": "Mozilla/5.0"
-}
+with sync_playwright() as p:
+    browser = p.chromium.launch(headless=True)
 
-response = requests.get(url, headers=headers)
+    page = browser.new_page()
 
-print(f"Status: {response.status_code}")
-print(response.text[:3000])
+    page.goto("https://www.auma.de/messen-finden/")
+
+    print("Seitentitel:")
+    print(page.title())
+
+    browser.close()
