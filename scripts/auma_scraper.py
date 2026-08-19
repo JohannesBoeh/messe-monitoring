@@ -14,19 +14,15 @@ with sync_playwright() as p:
 
     page.wait_for_timeout(3000)
 
-    print("Autocomplete-Einträge:")
+    print("Location Field:")
+    print(page.input_value("#location-input"))
 
-    options = page.locator("li")
+    print("\nAria Controls:")
 
-    count = min(options.count(), 50)
+    element = page.locator("#location-input")
 
-    for i in range(count):
-        try:
-            text = options.nth(i).inner_text().strip()
-
-            if text:
-                print(i, text)
-        except:
-            pass
+    print("aria-controls =", element.get_attribute("aria-controls"))
+    print("aria-expanded =", element.get_attribute("aria-expanded"))
+    print("role =", element.get_attribute("role"))
 
     browser.close()
