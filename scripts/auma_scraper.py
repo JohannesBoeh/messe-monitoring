@@ -10,6 +10,7 @@ with sync_playwright() as p:
         wait_until="networkidle"
     )
 
+    # München auswählen
     page.click("#location-input")
     page.fill("#location-input", "Mün")
 
@@ -20,26 +21,19 @@ with sync_playwright() as p:
 
     page.wait_for_timeout(2000)
 
-    buttons = page.locator("button")
+    print("Klicke Ergebnisse anzeigen...")
 
-    print("BUTTONS:\n")
+    page.locator("button").nth(25).click(force=True)
 
-    count = buttons.count()
+    page.wait_for_timeout(5000)
 
-    for i in range(count):
-        try:
-            btn = buttons.nth(i)
+    print("\nURL:")
+    print(page.url)
 
-            print(
-                i,
-                "|",
-                btn.inner_text().strip(),
-                "|",
-                btn.get_attribute("aria-controls"),
-                "|",
-                btn.get_attribute("type")
-            )
-        except:
-            pass
+    print("\nERSTE 3000 ZEICHEN:\n")
+
+    body = page.locator("body").inner_text()
+
+    print(body[:3000])
 
     browser.close()
