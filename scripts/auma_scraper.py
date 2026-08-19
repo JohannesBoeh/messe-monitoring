@@ -1,15 +1,15 @@
 from playwright.sync_api import sync_playwright
 
-def log_response(response):
-    if "getWebOverviewTradeFairDataCount" in response.url:
-        print("URL:")
-        print(response.url)
+seen = set()
 
-        try:
-            print("\nRESPONSE:")
-            print(response.text())
-        except Exception as e:
-            print(e)
+def log_response(response):
+    url = response.url
+
+    if "/api/TradeFairData/" in url and url not in seen:
+        seen.add(url)
+
+        print("\nAPI:")
+        print(url)
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
@@ -31,6 +31,6 @@ with sync_playwright() as p:
     page.keyboard.press("ArrowDown")
     page.keyboard.press("Enter")
 
-    page.wait_for_timeout(8000)
+    page.wait_for_timeout(10000)
 
     browser.close()
