@@ -1,6 +1,6 @@
 import requests
 
-print("Teste Verbindung zu AUMA...")
+print("Lade AUMA Startseite...")
 
 url = "https://www.auma.de"
 
@@ -10,7 +10,7 @@ headers = {
 
 response = requests.get(url, headers=headers)
 
-print(f"Status Code: {response.status_code}")
-print(f"Inhalt erhalten: {len(response.text)} Zeichen")
+with open("output/auma_homepage.html", "w", encoding="utf-8") as f:
+    f.write(response.text)
 
-print(response.text[:500])
+print("Datei gespeichert.")
