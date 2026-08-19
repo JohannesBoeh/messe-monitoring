@@ -9,14 +9,13 @@ headers = {
 
 response = requests.get(url, headers=headers)
 
-print(f"Status Code: {response.status_code}")
-
 soup = BeautifulSoup(response.text, "html.parser")
 
-print("\nSeitentitel:")
-print(soup.title.text)
+forms = soup.find_all("form")
 
-print("\nErste 20 Formularelemente:")
+print(f"Anzahl Formulare: {len(forms)}")
 
-for tag in soup.find_all(["input", "select"])[0:20]:
-    print(tag)
+for i, form in enumerate(forms):
+    print(f"\n--- FORMULAR {i+1} ---")
+    print(form.get("action"))
+    print(form.get("method"))
