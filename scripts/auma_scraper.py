@@ -13,6 +13,14 @@ with sync_playwright() as p:
     # München eintragen
     page.fill("#location-input", "München")
 
+button = page.get_by_text("Ergebnisse anzeigen")
+
+button.click(force=True)
+
+page.wait_for_timeout(5000)
+
+print(page.url)
+
     # Suchbutton klicken
     page.get_by_text("Ergebnisse anzeigen").click()
 
