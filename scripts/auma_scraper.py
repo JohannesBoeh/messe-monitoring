@@ -1,5 +1,15 @@
 import requests
-import json
+
+A_CITIES = [
+    "Berlin",
+    "Düsseldorf",
+    "Frankfurt",
+    "Hamburg",
+    "Köln",
+    "Leipzig",
+    "München",
+    "Stuttgart"
+]
 
 url = (
     "https://www.auma.de/api/TradeFairData/"
@@ -11,20 +21,17 @@ url = (
     "&strLanguage=de"
 )
 
-response = requests.get(
+data = requests.get(
     url,
     headers={"User-Agent": "Mozilla/5.0"}
-)
+).json()
 
-data = response.json()
+print("A-STANDORTE\\n")
 
-first_fair = data[0]
+for city in A_CITIES:
+    count = sum(
+        1 for fair in data
+        if fair.get("strStadt") == city
+    )
 
-print("MESSE:")
-print(first_fair["strTitel"])
-
-print("\nURL PARAMETER:")
-print(first_fair["strUrlParameter"])
-
-print("\nMESSE KEY:")
-print(first_fair["strMesseTerminKey"])
+    print(f"{city}: {count}")
