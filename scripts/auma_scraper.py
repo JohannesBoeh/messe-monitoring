@@ -11,11 +11,11 @@ response = requests.get(url, headers=headers)
 
 soup = BeautifulSoup(response.text, "html.parser")
 
-forms = soup.find_all("form")
+print("Inputs mit Name-Attribut:\n")
 
-print(f"Anzahl Formulare: {len(forms)}")
-
-for i, form in enumerate(forms):
-    print(f"\n--- FORMULAR {i+1} ---")
-    print(form.get("action"))
-    print(form.get("method"))
+for inp in soup.find_all("input"):
+    print("NAME :", inp.get("name"))
+    print("ID   :", inp.get("id"))
+    print("TYPE :", inp.get("type"))
+    print("VALUE:", inp.get("value"))
+    print("-" * 40)
