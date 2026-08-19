@@ -18,9 +18,13 @@ response = requests.get(
 
 data = response.json()
 
-print("ANZAHL:")
-print(len(data))
+first_fair = data[0]
 
-print("\nERSTER DATENSATZ:\n")
+print("MESSE:")
+print(first_fair["strTitel"])
 
-print(json.dumps(data[0], indent=2, ensure_ascii=False))
+print("\nURL PARAMETER:")
+print(first_fair["strUrlParameter"])
+
+print("\nMESSE KEY:")
+print(first_fair["strMesseTerminKey"])
