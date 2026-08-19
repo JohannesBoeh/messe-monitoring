@@ -22,16 +22,32 @@ url = (
     "&strLanguage=de"
 )
 
-data = requests.get(
+response = requests.get(
     url,
     headers={"User-Agent": "Mozilla/5.0"}
-).json()
+)
+
+data = response.json()
 
 filtered = [
     fair
     for fair in data
     if fair.get("strStadt") in A_CITIES
 ]
+
+rows = []
+
+for fair in filtered:
+    rows.append({
+        "MesseID": fair.get("strMesseTerminKey"),
+        "MesseName": fair.get("strTitel"),
+        "Stadt": fair.get("strStadt"),
+        "Land": fair.get("strLand"),
+        "Termin": fair.get("strTermin"),
+        "Kategorie": fair.get("strKategorie"),
+        "FKM": fair.get("blnFKM"),
+        "UrlParameter": fair.get("strUrlParameter")
+    })
 
 with open(
     "a_standorte.csv",
@@ -43,17 +59,25 @@ with open(
     writer = csv.DictWriter(
         file,
         fieldnames=[
-            "strMesseTerminKey",
-            "strTitel",
-            "strStadt",
-            "strTermin",
-            "strKategorie",
-            "blnFKM",
-            "strUrlParameter"
+            "MesseID",
+            "MesseName",
+            "Stadt",
+            "Land",
+            "Termin",
+            "Kategorie",
+            "FKM",
+            "UrlParameter"
         ]
     )
 
     writer.writeheader()
-    writer.writerows(filtered)
+    writer.writerows(rows)
 
-print("Datensätze:", len(filtered))
+print("Datensätze exportiert:", len(rows))
+
+for row in rows[:10]:
+    print(
+        row["Stadt"],
+        "-",
+        row["MesseName"]
+    )
