@@ -10,6 +10,7 @@ with sync_playwright() as p:
         wait_until="networkidle"
     )
 
+    # München auswählen
     page.click("#location-input")
     page.fill("#location-input", "Mün")
 
@@ -18,16 +19,20 @@ with sync_playwright() as p:
     page.keyboard.press("ArrowDown")
     page.keyboard.press("Enter")
 
-    page.wait_for_timeout(3000)
+    page.wait_for_timeout(2000)
+
+    # Ergebnisse anzeigen anklicken
+    page.locator("button").nth(26).click(force=True)
+
+    page.wait_for_timeout(5000)
+
+    print("URL:")
+    print(page.url)
+
+    print("\nErste 1000 Zeichen:")
 
     text = page.locator("body").inner_text()
 
-    lines = text.splitlines()
-
-    print("ERGEBNISSE:")
-
-    for line in lines:
-        if "München" in line:
-            print(line)
+    print(text[:1000])
 
     browser.close()
