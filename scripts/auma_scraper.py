@@ -2,5 +2,14 @@ from cities import CITIES
 
 print("Starte AUMA-Scraper...\n")
 
+all_messen = []
+
 for item in CITIES:
-    print(f"Stadt: {item['city']} | Klasse: {item['class']}")
+    messe = {
+        "stadt": item["city"],
+        "standortklasse": item["class"]
+    }
+
+    all_messen.append(messe)
+
+print(all_messen)
