@@ -10,26 +10,19 @@ with sync_playwright() as p:
         wait_until="networkidle"
     )
 
-    # München eintragen
     page.fill("#location-input", "München")
 
-button = page.get_by_text("Ergebnisse anzeigen")
+    page.wait_for_timeout(3000)
 
-button.click(force=True)
+    print("Überschriften:")
 
-page.wait_for_timeout(5000)
+    headings = page.locator("h1, h2, h3")
 
-print(page.url)
-
-    # Suchbutton klicken
-    page.get_by_text("Ergebnisse anzeigen").click()
-
-    page.wait_for_timeout(5000)
-
-    print("URL nach Suche:")
-    print(page.url)
-
-    print("\nTitel:")
-    print(page.title())
+    for i in range(headings.count()):
+        try:
+            print(headings.nth(i).inner_text())
+        except:
+            pass
 
     browser.close()
+`
