@@ -11,10 +11,12 @@ response = requests.get(url, headers=headers)
 
 soup = BeautifulSoup(response.text, "html.parser")
 
-print("Links auf der Startseite:\n")
+print("Links mit URL:\n")
 
 for link in soup.find_all("a", href=True):
     text = link.get_text(strip=True)
 
-    if text:
-        print(text)
+    if "Messen finden" in text:
+        print("TEXT:", text)
+        print("URL :", link["href"])
+        print("-" * 50)
