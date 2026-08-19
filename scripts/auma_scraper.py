@@ -1,25 +1,11 @@
 from cities import CITIES
-import csv
+import requests
 
-print("Starte AUMA-Scraper...\n")
+print("Teste Verbindung zu AUMA...")
 
-all_messen = []
+url = "https://www.auma.de"
 
-for item in CITIES:
-    messe = {
-        "stadt": item["city"],
-        "standortklasse": item["class"]
-    }
+response = requests.get(url)
 
-    all_messen.append(messe)
-
-with open("output/raw_auma.csv", "w", newline="", encoding="utf-8") as file:
-    writer = csv.DictWriter(
-        file,
-        fieldnames=["stadt", "standortklasse"]
-    )
-
-    writer.writeheader()
-    writer.writerows(all_messen)
-
-print("CSV erfolgreich erstellt.")
+print(f"Status Code: {response.status_code}")
+print(f"Inhalt erhalten: {len(response.text)} Zeichen")
