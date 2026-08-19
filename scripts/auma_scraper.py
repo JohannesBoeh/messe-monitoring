@@ -1,9 +1,24 @@
 from playwright.sync_api import sync_playwright
 
+def log_response(response):
+    url = response.url
+
+    if any(x in url.lower() for x in [
+        "search",
+        "messe",
+        "fair",
+        "api",
+        "ajax",
+        "filter"
+    ]):
+        print(url)
+
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
 
     page = browser.new_page()
+
+    page.on("response", log_response)
 
     page.goto(
         "https://www.auma.de/messen-finden/",
@@ -18,17 +33,6 @@ with sync_playwright() as p:
     page.keyboard.press("ArrowDown")
     page.keyboard.press("Enter")
 
-    page.wait_for_timeout(3000)
-
-    print("Aktive Filter:")
-
-    for text in page.locator("body").inner_text().splitlines():
-        text = text.strip()
-
-        if "München" in text:
-            print(text)
-
-    print("\nURL:")
-    print(page.url)
+    page.wait_for_timeout(5000)
 
     browser.close()
