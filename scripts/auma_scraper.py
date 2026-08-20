@@ -1,5 +1,5 @@
 import requests
-import csv
+from collections import Counter
 
 TARGET_CITIES = [
     "Berlin",
@@ -29,7 +29,7 @@ response = requests.get(
 
 data = response.json()
 
-rows = []
+fkm_fairs = []
 
 for fair in data:
 
@@ -39,42 +39,26 @@ for fair in data:
         fair.get("blnFKM")
         and any(target in city for target in TARGET_CITIES)
     ):
+        fkm_fairs.append(fair)
 
-        rows.append({
-            "MesseID": fair.get("strMesseTerminKey"),
-            "MesseName": fair.get("strTitel"),
-            "Termin": fair.get("strTermin"),
-            "Stadt": fair.get("strStadt"),
-            "Land": fair.get("strLand"),
-            "Kategorie": fair.get("strKategorie"),
-            "Foerderung": fair.get("strFoerderung"),
-            "FKM": fair.get("blnFKM"),
-            "UrlParameter": fair.get("strUrlParameter")
-        })
+print("FKM-Messen gesamt:")
+print(len(fkm_fairs))
 
-with open(
-    "fkm_messen.csv",
-    "w",
-    newline="",
-    encoding="utf-8"
-) as file:
+print("\nFKM-Messen je Stadt:\n")
 
-    writer = csv.DictWriter(
-        file,
-        fieldnames=[
-            "MesseID",
-            "MesseName",
-            "Termin",
-            "Stadt",
-            "Land",
-            "Kategorie",
-            "Foerderung",
-            "FKM",
-            "UrlParameter"
-        ]
+counter = Counter()
+
+for fair in fkm_fairs:
+    counter[fair["strStadt"]] += 1
+
+for city, count in counter.most_common():
+    print(f"{city}: {count}")
+
+print("\nERSTE 20 FKM-MESSEN\n")
+
+for fair in fkm_fairs[:20]:
+    print(
+        fair["strStadt"],
+        "-",
+        fair["strTitel"]
     )
-
-    writer.writeheader()
-    writer.writerows(rows)
-
-print("FKM-Messen exportiert:", len(rows))
