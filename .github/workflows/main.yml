@@ -16,7 +16,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests
+          pip install requests playwright
+          python -m playwright install chromium
 
       - name: Run scraper
         run: python scripts/auma_scraper.py
@@ -26,3 +27,4 @@ jobs:
         with:
           name: auma-a-standorte
           path: a_standorte.csv
+``
