@@ -1,6 +1,5 @@
 import requests
 import csv
-from bs4 import BeautifulSoup
 
 TARGET_CITIES = [
     "Berlin",
@@ -47,10 +46,7 @@ for fair in data:
         "Jahr": "2026",
         "Monat": fair.get("strTermin", "")[:2],
         "Termin": fair.get("strTermin"),
-        "Stadt": city,
-        "Turnus": "",
-        "Besucherzahl": "",
-        "Ausstellerzahl": ""
+        "Stadt": city
     })
 
     if len(rows) >= 10:
@@ -70,5 +66,10 @@ with open(
             "Jahr",
             "Monat",
             "Termin",
-            "Stadt",
-            "
+            "Stadt"
+        ],
+        delimiter=";"
+    )
+
+    writer.writeheader()
+    writer
