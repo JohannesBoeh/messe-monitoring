@@ -24,8 +24,8 @@ soup = BeautifulSoup(
 print("\nSEITENTITEL:")
 print(soup.title.text)
 
-print("\nERSTE 10000 ZEICHEN:\n")
+print("\nERSTE 15000 ZEICHEN:\n")
 
 text = soup.get_text("\n", strip=True)
 
-print(text[:10000])
+print(text[:15000])
