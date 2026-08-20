@@ -1,54 +1,17 @@
 import requests
-import csv
+from bs4 import BeautifulSoup
 
-API_URL = (
-    "https://www.auma.de/api/TradeFairData/"
-    "getWebOverviewTradeFairData"
-    "?intFilterYearFrom=2026"
-    "&intFilterYearTo=2032"
-    "&intFilterMonthFrom=1"
-    "&intFilterMonthTo=12"
-    "&strLanguage=de"
-)
+url = "https://www.auma.de/messen-finden/details/?tfd=dusseldorf_psi_229475"
 
 response = requests.get(
-    API_URL,
+    url,
     headers={"User-Agent": "Mozilla/5.0"}
 )
 
-data = response.json()
+soup = BeautifulSoup(response.text, "html.parser")
 
-rows = []
+text = soup.get_text("\n", strip=True)
 
-for fair in data:
-
-    if fair.get("blnFKM"):
-
-        rows.append({
-            "MesseName": fair.get("strTitel"),
-            "Stadt": fair.get("strStadt"),
-            "Termin": fair.get("strTermin"),
-            "UrlParameter": fair.get("strUrlParameter")
-        })
-
-with open(
-    "fkm_messen.csv",
-    "w",
-    newline="",
-    encoding="utf-8"
-) as file:
-
-    writer = csv.DictWriter(
-        file,
-        fieldnames=[
-            "MesseName",
-            "Stadt",
-            "Termin",
-            "UrlParameter"
-        ]
-    )
-
-    writer.writeheader()
-    writer.writerows(rows)
-
-print("Exportiert:", len(rows))
+print("Zeichen im Text:", len(text))
+print()
+print(text[:5000])
