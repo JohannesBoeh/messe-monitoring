@@ -12,12 +12,10 @@ API_URL = (
     "&strLanguage=de"
 )
 
-response = requests.get(
+data = requests.get(
     API_URL,
     headers={"User-Agent": "Mozilla/5.0"}
-)
-
-data = response.json()
+).json()
 
 rows = []
 
@@ -31,15 +29,41 @@ for fair in data:
         + fair["strUrlParameter"]
     )
 
-    rows.append({
-        "MesseName": fair["strTitel"],
-        "Stadt": fair["strStadt"],
-        "Termin": fair["strTermin"],
-        "DetailURL": detail_url
-    })
+    try:
 
-    if len(rows) >= 10:
-        break
+        response = requests.get(
+            detail_url,
+            headers={"User-Agent": "Mozilla/5.0"},
+            timeout=30
+        )
+
+        soup = BeautifulSoup(
+            response.text,
+            "html.parser"
+        )
+
+        text = soup.get_text("\n", strip=True)
+
+        rows.append({
+            "MesseName": fair.get("strTitel"),
+            "Stadt": fair.get("strStadt"),
+            "Termin": fair.get("strTermin"),
+            "FKM": fair.get("blnFKM"),
+            "DetailURL": detail_url,
+            "TextLaenge": len(text)
+        })
+
+        print(
+            f"{len(rows)} | "
+            f"{fair.get('strTitel')}"
+        )
+
+        if len(rows) >= 10:
+            break
+
+    except Exception as e:
+
+        print("FEHLER:", e)
 
 with open(
     "fkm_detail_test.csv",
@@ -54,11 +78,15 @@ with open(
             "MesseName",
             "Stadt",
             "Termin",
-            "DetailURL"
+            "FKM",
+            "DetailURL",
+            "TextLaenge"
         ]
     )
 
     writer.writeheader()
     writer.writerows(rows)
 
+print()
 print("Exportiert:", len(rows))
+``
