@@ -1,4 +1,16 @@
 import requests
+import csv
+
+TARGET_CITIES = [
+    "Berlin",
+    "Düsseldorf",
+    "Frankfurt am Main",
+    "Hamburg",
+    "Köln",
+    "Leipzig",
+    "München",
+    "Stuttgart"
+]
 
 API_URL = (
     "https://www.auma.de/api/TradeFairData/"
@@ -17,18 +29,44 @@ response = requests.get(
 
 data = response.json()
 
-print("Anzahl Datensätze:")
-print(len(data))
-
-print("\nErste 50 Städte:\n")
-
-count = 0
+rows = []
 
 for fair in data:
 
-    print(fair.get("strStadt"))
+    city = fair.get("strStadt", "")
 
-    count += 1
+    if city not in TARGET_CITIES:
+        continue
 
-    if count >= 50:
-        break
+    if not fair.get("blnFKM"):
+        continue
+
+    rows.append({
+        "Messe": fair.get("strTitel"),
+        "Termin": fair.get("strTermin"),
+        "Stadt": city
+    })
+
+print("Gefundene Messen:", len(rows))
+
+with open(
+    "AUMA_FKM_Messen.csv",
+    "w",
+    newline="",
+    encoding="utf-8-sig"
+) as file:
+
+    writer = csv.DictWriter(
+        file,
+        fieldnames=[
+            "Messe",
+            "Termin",
+            "Stadt"
+        ],
+        delimiter=";"
+    )
+
+    writer.writeheader()
+    writer.writerows(rows)
+
+print("CSV geschrieben")
