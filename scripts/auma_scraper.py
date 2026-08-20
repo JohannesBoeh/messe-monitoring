@@ -1,43 +1,40 @@
 import requests
 
-url = (
-    "https://www.auma.de/api/TradeFairData/"
-    "getWebOverviewTradeFairData"
-    "?intFilterYearFrom=2026"
-    "&intFilterYearTo=2032"
-    "&intFilterMonthFrom=1"
-    "&intFilterMonthTo=12"
-    "&strLanguage=de"
+url = "https://www.auma.de/messen-finden/details/?tfd=dusseldorf_psi_229475"
+
+response = requests.get(
+    url,
+    headers={
+        "User-Agent": "Mozilla/5.0"
+    }
 )
 
-data = requests.get(
-    url,
-    headers={"User-Agent": "Mozilla/5.0"}
-).json()
+text = response.text
 
-count = 0
+suchbegriffe = [
+    "Turnus:",
+    "Gründungsjahr:",
+    "RX Deutschland GmbH",
+    "Fachbesucher",
+    "Aussteller",
+    "Besucher",
+    "Bruttofläche",
+    "Nettofläche"
+]
 
-for fair in data:
+print("GEFUNDENE TREFFER:\n")
 
-    if fair.get("blnFKM"):
+for begriff in suchbegriffe:
 
-        detail_url = (
-            "https://www.auma.de/messen-finden/details/?tfd="
-            + fair["strUrlParameter"]
-        )
+    pos = text.find(begriff)
 
-        response = requests.get(
-            detail_url,
-            headers={"User-Agent": "Mozilla/5.0"}
-        )
+    if pos != -1:
 
-        print("\n================================================")
-        print(fair["strTitel"])
-        print(response.status_code)
-        print(detail_url)
+        start = max(0, pos - 200)
+        end = min(len(text), pos + 1000)
 
-        count += 1
+        print("\n" + "=" * 80)
+        print(begriff)
+        print("=" * 80)
 
-        if count == 10:
-            break
-``
+        print(text[start:end])
