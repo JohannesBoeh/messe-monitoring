@@ -1,31 +1,43 @@
 import requests
-from bs4 import BeautifulSoup
 
-url = "https://www.auma.de/messen-finden/details/?tfd=dusseldorf_psi_229475"
+url = (
+    "https://www.auma.de/api/TradeFairData/"
+    "getWebOverviewTradeFairData"
+    "?intFilterYearFrom=2026"
+    "&intFilterYearTo=2032"
+    "&intFilterMonthFrom=1"
+    "&intFilterMonthTo=12"
+    "&strLanguage=de"
+)
 
-response = requests.get(
+data = requests.get(
     url,
-    headers={
-        "User-Agent": "Mozilla/5.0"
-    }
-)
+    headers={"User-Agent": "Mozilla/5.0"}
+).json()
 
-print("STATUS:")
-print(response.status_code)
+count = 0
 
-print("\nFINAL URL:")
-print(response.url)
+for fair in data:
 
-soup = BeautifulSoup(
-    response.text,
-    "html.parser"
-)
+    if fair.get("blnFKM"):
 
-print("\nSEITENTITEL:")
-print(soup.title.text)
+        detail_url = (
+            "https://www.auma.de/messen-finden/details/?tfd="
+            + fair["strUrlParameter"]
+        )
 
-print("\nERSTE 15000 ZEICHEN:\n")
+        response = requests.get(
+            detail_url,
+            headers={"User-Agent": "Mozilla/5.0"}
+        )
 
-text = soup.get_text("\n", strip=True)
+        print("\n================================================")
+        print(fair["strTitel"])
+        print(response.status_code)
+        print(detail_url)
 
-print(text[:15000])
+        count += 1
+
+        if count == 10:
+            break
+``
