@@ -1,5 +1,6 @@
 import requests
 import csv
+import re
 
 TARGET_CITIES = [
     "Berlin",
@@ -41,13 +42,28 @@ for fair in data:
     if not fair.get("blnFKM"):
         continue
 
+    termin = fair.get("strTermin", "")
+
+    jahr = ""
+    monat = ""
+
+    jahr_match = re.search(r"(20\d{2})", termin)
+
+    if jahr_match:
+        jahr = jahr_match.group(1)
+
+    monat_match = re.match(r"(\d{2})\.", termin)
+
+    if monat_match:
+        monat = monat_match.group(1)
+
     rows.append({
         "Messe": fair.get("strTitel"),
-        "Termin": fair.get("strTermin"),
+        "Jahr": jahr,
+        "Monat": monat,
+        "Termin": termin,
         "Stadt": city
     })
-
-print("Gefundene Messen:", len(rows))
 
 with open(
     "AUMA_FKM_Messen.csv",
@@ -59,14 +75,3 @@ with open(
     writer = csv.DictWriter(
         file,
         fieldnames=[
-            "Messe",
-            "Termin",
-            "Stadt"
-        ],
-        delimiter=";"
-    )
-
-    writer.writeheader()
-    writer.writerows(rows)
-
-print("CSV geschrieben")
