@@ -1,27 +1,23 @@
 import requests
 
-url = (
-    "https://www.auma.de/api/TradeFairData/"
-    "getWebOverviewTradeFairData"
-    "?intFilterYearFrom=2026"
-    "&intFilterYearTo=2032"
-    "&intFilterMonthFrom=1"
-    "&intFilterMonthTo=12"
-    "&strLanguage=de"
+url = "https://www.auma.de/messen-finden/messe/dusseldorf_psi_229475"
+
+response = requests.get(
+    url,
+    headers={
+        "User-Agent": "Mozilla/5.0"
+    }
 )
 
-data = requests.get(
-    url,
-    headers={"User-Agent": "Mozilla/5.0"}
-).json()
+print("URL:")
+print(url)
 
-for fair in data:
+print("\nStatus:")
+print(response.status_code)
 
-    if fair.get("strMesseTerminKey") == "229475":
+print("\nFinal URL:")
+print(response.url)
 
-        print("PSI gefunden:\n")
+print("\nErste 5000 Zeichen:\n")
 
-        for key, value in fair.items():
-            print(f"{key}: {value}")
-
-        break
+print(response.text[:5000])
