@@ -1,45 +1,79 @@
 import requests
+import csv
 from bs4 import BeautifulSoup
 
-detail_url = (
-    "https://www.auma.de/messen-finden/details/"
-    "?tfd=dusseldorf_psi_229475"
+API_URL = (
+    "https://www.auma.de/api/TradeFairData/"
+    "getWebOverviewTradeFairData"
+    "?intFilterYearFrom=2026"
+    "&intFilterYearTo=2032"
+    "&intFilterMonthFrom=1"
+    "&intFilterMonthTo=12"
+    "&strLanguage=de"
 )
 
-response = requests.get(
-    detail_url,
+data = requests.get(
+    API_URL,
     headers={"User-Agent": "Mozilla/5.0"}
-)
+).json()
 
-soup = BeautifulSoup(response.text, "html.parser")
+rows = []
 
-text = soup.get_text("\n", strip=True)
+count = 0
 
-lines = []
+for fair in data:
 
-for line in text.split("\n"):
+    if not fair.get("blnFKM"):
+        continue
 
-    line = line.strip()
+    detail_url = (
+        "https://www.auma.de/messen-finden/details/?tfd="
+        + fair["strUrlParameter"]
+    )
 
-    if line:
-        lines.append(line)
+    try:
 
-for i, line in enumerate(lines):
+        response = requests.get(
+            detail_url,
+            headers={"User-Agent": "Mozilla/5.0"},
+            timeout=30
+        )
 
-    if line in [
-        "Turnus:",
-        "Gründungsjahr:",
-        "Veranstalter",
-        "Zutritt",
-        "Aussteller",
-        "Besucher",
-        "Bruttofläche",
-        "Nettofläche"
-    ]:
+        soup = BeautifulSoup(
+            response.text,
+            "html.parser"
+        )
 
-        print("\n" + "=" * 80)
-        print(line)
-        print("=" * 80)
+        text = soup.get_text("\n", strip=True)
 
-        for x in lines[i:i+20]:
-            print(x)
+        rows.append({
+            "MesseName": fair.get("strTitel"),
+            "Stadt": fair.get("strStadt"),
+            "Termin": fair.get("strTermin"),
+            "DetailURL": detail_url,
+            "Seitenlaenge": len(text)
+        })
+
+        print(
+            f"{len(rows)} | "
+            f"{fair.get('strTitel')}"
+        )
+
+        count += 1
+
+        if count >= 10:
+            break
+
+    except Exception as e:
+        print("FEHLER:", e)
+
+with open(
+    "fkm_detail_test.csv",
+    "w",
+    newline="",
+    encoding="utf-8"
+) as file:
+
+    writer = csv.DictWriter(
+        file,
+  
