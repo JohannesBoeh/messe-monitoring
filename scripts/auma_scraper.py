@@ -59,4 +59,22 @@ with open(
     encoding="utf-8"
 ) as file:
 
-    writer
+    writer = csv.DictWriter(
+        file,
+        fieldnames=[
+            "MesseID",
+            "MesseName",
+            "Termin",
+            "Stadt",
+            "Land",
+            "Kategorie",
+            "Foerderung",
+            "FKM",
+            "UrlParameter"
+        ]
+    )
+
+    writer.writeheader()
+    writer.writerows(rows)
+
+print("FKM-Messen exportiert:", len(rows))
