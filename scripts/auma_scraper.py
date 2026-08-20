@@ -1,34 +1,49 @@
 import requests
+import json
 
-BASE_URL = "https://www.auma.de/api/TradeFairData/"
+url = (
+    "https://www.auma.de/api/TradeFairData/"
+    "getWebOverviewTradeFairData"
+    "?intFilterYearFrom=2026"
+    "&intFilterYearTo=2032"
+    "&intFilterMonthFrom=1"
+    "&intFilterMonthTo=12"
+    "&strLanguage=de"
+)
 
-endpoints = [
-    "getTradeFairData?messeTerminKey=229475",
-    "getTradeFairData?intMesseTerminKey=229475",
-    "getTradeFairDetails?messeTerminKey=229475",
-    "getTradeFairDetails?intMesseTerminKey=229475",
-    "getWebTradeFairData?messeTerminKey=229475",
-    "getWebTradeFairData?intMesseTerminKey=229475"
-]
+response = requests.get(
+    url,
+    headers={"User-Agent": "Mozilla/5.0"}
+)
 
-for endpoint in endpoints:
+data = response.json()
 
-    url = BASE_URL + endpoint
+print("ANZAHL:")
+print(len(data))
 
-    print("\n" + "=" * 80)
-    print(url)
+print("\nFKM MESSEN:\n")
 
-    try:
+count = 0
 
-        response = requests.get(
-            url,
-            headers={"User-Agent": "Mozilla/5.0"},
-            timeout=30
-        )
+for fair in data:
 
-        print("STATUS:", response.status_code)
-        print(response.text[:1000])
+    if fair.get("blnFKM"):
 
-    except Exception as e:
+        print("=" * 80)
 
-        print("ERROR:", e)
+        print("TITEL:")
+        print(fair.get("strTitel"))
+
+        print("\nMESSE KEY:")
+        print(fair.get("strMesseTerminKey"))
+
+        print("\nURL PARAMETER:")
+        print(fair.get("strUrlParameter"))
+
+        print("\nSTADT:")
+        print(fair.get("strStadt"))
+
+        count += 1
+
+        if count == 10:
+            break
