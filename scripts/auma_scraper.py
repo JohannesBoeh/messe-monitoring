@@ -35,8 +35,10 @@ Run:
 35| import time
 36| from pathlib import Path
 37| 
-38| import requests
-39| from bs4 import BeautifulSoup
+37| import requests
+38| from requests.adapters import HTTPAdapter
+39| from urllib3.util.retry import Retry
+40| from bs4 import BeautifulSoup
 40| 
 41| # Setup logging
 42| logger = logging.getLogger(__name__)
