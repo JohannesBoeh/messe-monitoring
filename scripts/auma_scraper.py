@@ -1,5 +1,5 @@
 import requests
-from collections import Counter
+import csv
 
 TARGET_CITIES = [
     "Berlin",
@@ -29,33 +29,34 @@ response = requests.get(
 
 data = response.json()
 
-filtered = []
+rows = []
 
 for fair in data:
 
     city = fair.get("strStadt", "")
 
-    if any(target in city for target in TARGET_CITIES):
-        filtered.append(fair)
+    if (
+        fair.get("blnFKM")
+        and any(target in city for target in TARGET_CITIES)
+    ):
 
-print("Gesamtzahl A-Standorte:")
-print(len(filtered))
+        rows.append({
+            "MesseID": fair.get("strMesseTerminKey"),
+            "MesseName": fair.get("strTitel"),
+            "Termin": fair.get("strTermin"),
+            "Stadt": fair.get("strStadt"),
+            "Land": fair.get("strLand"),
+            "Kategorie": fair.get("strKategorie"),
+            "Foerderung": fair.get("strFoerderung"),
+            "FKM": fair.get("blnFKM"),
+            "UrlParameter": fair.get("strUrlParameter")
+        })
 
-print("\nMessen je Stadt:\n")
+with open(
+    "fkm_messen.csv",
+    "w",
+    newline="",
+    encoding="utf-8"
+) as file:
 
-city_counter = Counter()
-
-for fair in filtered:
-    city_counter[fair["strStadt"]] += 1
-
-for city, count in city_counter.most_common():
-    print(f"{city}: {count}")
-
-print("\nFKM-Messen:\n")
-
-fkm_count = sum(
-    1 for fair in filtered
-    if fair.get("blnFKM")
-)
-
-print(fkm_count)
+    writer
