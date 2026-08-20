@@ -90,13 +90,10 @@ def clean_number(val):
 
 
 def get_detail_url(fair):
-    for key in ("strUrl", "strLink", "strDetailUrl", "strHref", "strPath", "strSlug", "strDetailLink"):
-        val = fair.get(key, "")
-        if val:
-            return val if val.startswith("http") else AUMA_BASE + val
-    fair_id = fair.get("intId") or fair.get("intFairId") or fair.get("id")
-    if fair_id:
-        return "{}/de/messesuche/{}".format(AUMA_BASE, fair_id)
+    # Confirmed field from API: strUrlParameter = "berlin_gruene-woche_12345"
+    url_param = fair.get("strUrlParameter", "")
+    if url_param:
+        return "{}/de/messesuche/{}".format(AUMA_BASE, url_param)
     return ""
 
 
@@ -228,7 +225,7 @@ def main():
 
         termin     = fair.get("strTermin", "")
         detail_url = get_detail_url(fair)
-        fair_id    = fair.get("intId") or fair.get("intFairId") or fair.get("id")
+        fair_id    = fair.get("strMesseTerminKey") or fair.get("intId") or fair.get("id")
 
         row = {
             "Messe":                fair.get("strTitel", ""),
