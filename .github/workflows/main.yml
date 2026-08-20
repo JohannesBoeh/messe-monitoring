@@ -16,9 +16,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests playwright
+          pip install requests beautifulsoup4 playwright
           python -m playwright install chromium
-
       - name: Run scraper
         run: python scripts/auma_scraper.py
 
