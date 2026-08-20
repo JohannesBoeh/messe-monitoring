@@ -15,36 +15,27 @@ data = requests.get(
     headers={"User-Agent": "Mozilla/5.0"}
 ).json()
 
-fkm_fairs = []
+fkm_count = sum(
+    1 for fair in data
+    if fair.get("blnFKM")
+)
+
+print("FKM-Messen:")
+print(fkm_count)
+
+print("\nERSTE 10:\n")
+
+counter = 0
 
 for fair in data:
 
     if fair.get("blnFKM"):
 
-        detail_url = (
-            "https://www.auma.de/messen-finden/details/?tfd="
-            + fair["strUrlParameter"]
-        )
+        print(fair["strTitel"])
+        print(fair["strUrlParameter"])
+        print()
 
-        response = requests.get(
-            detail_url,
-            headers={"User-Agent": "Mozilla/5.0"}
-        )
+        counter += 1
 
-        fkm_fairs.append({
-            "Titel": fair["strTitel"],
-            "Status": response.status_code,
-            "URL": detail_url
-        })
-
-print("FKM-Seiten geprüft:", len(fkm_fairs))
-
-ok = sum(
-    1 for x in fkm_fairs
-    if x["Status"] == 200
-)
-
-print("Status 200:", ok)
-
-for row in fkm_fairs[:20]:
-    print(row)
+        if counter >= 10:
+            break
