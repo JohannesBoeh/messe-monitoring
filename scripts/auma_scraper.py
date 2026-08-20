@@ -1,5 +1,5 @@
 import requests
-import csv
+from collections import Counter
 
 TARGET_CITIES = [
     "Berlin",
@@ -29,57 +29,33 @@ response = requests.get(
 
 data = response.json()
 
-rows = []
+filtered = []
 
 for fair in data:
 
     city = fair.get("strStadt", "")
 
     if any(target in city for target in TARGET_CITIES):
+        filtered.append(fair)
 
-        rows.append({
-            "MesseID": fair.get("strMesseTerminKey"),
-            "MesseName": fair.get("strTitel"),
-            "Termin": fair.get("strTermin"),
-            "Stadt": fair.get("strStadt"),
-            "Land": fair.get("strLand"),
-            "Kategorie": fair.get("strKategorie"),
-            "Foerderung": fair.get("strFoerderung"),
-            "FKM": fair.get("blnFKM"),
-            "DE": fair.get("blnDE"),
-            "HE": fair.get("blnHE"),
-            "WAN": fair.get("blnWAN"),
-            "GTQ": fair.get("blnGTQ"),
-            "UrlParameter": fair.get("strUrlParameter")
-        })
+print("Gesamtzahl A-Standorte:")
+print(len(filtered))
 
-with open(
-    "a_standorte.csv",
-    "w",
-    newline="",
-    encoding="utf-8"
-) as file:
+print("\nMessen je Stadt:\n")
 
-    writer = csv.DictWriter(
-        file,
-        fieldnames=[
-            "MesseID",
-            "MesseName",
-            "Termin",
-            "Stadt",
-            "Land",
-            "Kategorie",
-            "Foerderung",
-            "FKM",
-            "DE",
-            "HE",
-            "WAN",
-            "GTQ",
-            "UrlParameter"
-        ]
-    )
+city_counter = Counter()
 
-    writer.writeheader()
-    writer.writerows(rows)
+for fair in filtered:
+    city_counter[fair["strStadt"]] += 1
 
-print("Exportierte Datensätze:", len(rows))
+for city, count in city_counter.most_common():
+    print(f"{city}: {count}")
+
+print("\nFKM-Messen:\n")
+
+fkm_count = sum(
+    1 for fair in filtered
+    if fair.get("blnFKM")
+)
+
+print(fkm_count)
