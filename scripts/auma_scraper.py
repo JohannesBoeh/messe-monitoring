@@ -1,17 +1,65 @@
 import requests
-from bs4 import BeautifulSoup
+import csv
 
-url = "https://www.auma.de/messen-finden/details/?tfd=dusseldorf_psi_229475"
+API_URL = (
+    "https://www.auma.de/api/TradeFairData/"
+    "getWebOverviewTradeFairData"
+    "?intFilterYearFrom=2026"
+    "&intFilterYearTo=2032"
+    "&intFilterMonthFrom=1"
+    "&intFilterMonthTo=12"
+    "&strLanguage=de"
+)
 
 response = requests.get(
-    url,
+    API_URL,
     headers={"User-Agent": "Mozilla/5.0"}
 )
 
-soup = BeautifulSoup(response.text, "html.parser")
+data = response.json()
 
-text = soup.get_text("\n", strip=True)
+rows = []
 
-print("Zeichen im Text:", len(text))
-print()
-print(text[:5000])
+for fair in data:
+
+    if not fair.get("blnFKM"):
+        continue
+
+    detail_url = (
+        "https://www.auma.de/messen-finden/details/?tfd="
+        + fair["strUrlParameter"]
+    )
+
+    rows.append({
+        "MesseName": fair.get("strTitel"),
+        "Stadt": fair.get("strStadt"),
+        "Land": fair.get("strLand"),
+        "Termin": fair.get("strTermin"),
+        "DetailURL": detail_url
+    })
+
+    if len(rows) >= 10:
+        break
+
+with open(
+    "fkm_detail_test.csv",
+    "w",
+    newline="",
+    encoding="utf-8"
+) as file:
+
+    writer = csv.DictWriter(
+        file,
+        fieldnames=[
+            "MesseName",
+            "Stadt",
+            "Land",
+            "Termin",
+            "DetailURL"
+        ]
+    )
+
+    writer.writeheader()
+    writer.writerows(rows)
+
+print("Exportiert:", len(rows))
