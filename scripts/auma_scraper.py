@@ -132,26 +132,30 @@ def get_detail_url(fair):
 def try_detail_api(fair_id):
     if not fair_id:
         return {}
-    try:
-        r = requests.get(DETAIL_API.format(id=fair_id), headers=HEADERS, timeout=15)
-        if r.status_code != 200:
-            return {}
-        d = r.json()
-        if isinstance(d, list) and d:
-            d = d[0]
-        besucher   = clean_number(d.get("intBesucher") or d.get("strBesucher") or d.get("Besucher"))
-        aussteller = clean_number(d.get("intAussteller") or d.get("strAussteller") or d.get("Aussteller"))
-        if besucher or aussteller:
-            return {
-                "Besucherzahlen":      besucher,
-                "Ausstellerzahlen":    aussteller,
-                "Reichweite":          d.get("strReichweite", ""),
-                "Angebotsschwerpunkt": d.get("strAngebotsschwerpunkt", ""),
-            }
-    except Exception:
-        pass
-    return {}
-
+135|     try:
+136|         r = requests.get(DETAIL_API.format(id=fair_id), headers=HEADERS, timeout=15)
+137|         r.raise_for_status()  # Fehler bei Status != 200 werfen
+138|         d = r.json()
+139|         if isinstance(d, list) and d:
+140|             d = d[0]
+141|         besucher   = clean_number(d.get("intBesucher") or d.get("strBesucher") or d.get("Besucher"))
+142|         aussteller = clean_number(d.get("intAussteller") or d.get("strAussteller") or d.get("Aussteller"))
+143|         if besucher or aussteller:
+144|             return {
+145|                 "Besucherzahlen":      besucher,
+146|                 "Ausstellerzahlen":    aussteller,
+147|                 "Reichweite":          d.get("strReichweite", ""),
+148|                 "Angebotsschwerpunkt": d.get("strAngebotsschwerpunkt", ""),
+149|             }
+150|     except requests.Timeout:
+151|         logger.warning(f"Detail API timeout for fair {fair_id}")
+152|     except requests.HTTPError as e:
+153|         logger.warning(f"Detail API HTTP error for fair {fair_id}: {e}")
+154|     except ValueError:  # JSON-Parsing-Fehler
+155|         logger.warning(f"Detail API returned invalid JSON for fair {fair_id}")
+156|     except Exception as e:
+157|         logger.error(f"Unexpected error in detail API for fair {fair_id}: {e}")
+158|     return {}
 
 # ---------------------------------------------------------------------------
 # Strategy 2: Playwright + BeautifulSoup
