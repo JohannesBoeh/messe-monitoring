@@ -42,6 +42,9 @@ jobs:
       - name: Install Python dependencies
         run: pip install requests beautifulsoup4 playwright
 
+      - name: Debug API fields
+        run: python scripts/debug_api.py
+
       - name: Install Playwright browsers
         run: playwright install chromium --with-deps
 
