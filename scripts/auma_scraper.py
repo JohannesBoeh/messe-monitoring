@@ -45,12 +45,13 @@ for fair in data:
     termin = fair.get("strTermin", "")
 
     jahr = ""
-    monat = ""
 
     jahr_match = re.search(r"(20\d{2})", termin)
 
     if jahr_match:
         jahr = jahr_match.group(1)
+
+    monat = ""
 
     monat_match = re.match(r"(\d{2})\.", termin)
 
@@ -75,3 +76,16 @@ with open(
     writer = csv.DictWriter(
         file,
         fieldnames=[
+            "Messe",
+            "Jahr",
+            "Monat",
+            "Termin",
+            "Stadt"
+        ],
+        delimiter=";"
+    )
+
+    writer.writeheader()
+    writer.writerows(rows)
+
+print("Exportiert:", len(rows))
