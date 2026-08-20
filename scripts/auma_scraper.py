@@ -30,16 +30,35 @@ for fair in data:
         + fair["strUrlParameter"]
     )
 
-    rows.append({
-        "MesseName": fair.get("strTitel"),
-        "Stadt": fair.get("strStadt"),
-        "Land": fair.get("strLand"),
-        "Termin": fair.get("strTermin"),
-        "DetailURL": detail_url
-    })
+    try:
 
-    if len(rows) >= 10:
-        break
+        page = requests.get(
+            detail_url,
+            headers={"User-Agent": "Mozilla/5.0"},
+            timeout=30
+        )
+
+        rows.append({
+            "MesseName": fair.get("strTitel"),
+            "Stadt": fair.get("strStadt"),
+            "Termin": fair.get("strTermin"),
+            "Status": page.status_code,
+            "HTML_Laenge": len(page.text),
+            "DetailURL": detail_url
+        })
+
+        print(
+            f"{len(rows)} | "
+            f"{fair.get('strTitel')} | "
+            f"{page.status_code}"
+        )
+
+        if len(rows) >= 10:
+            break
+
+    except Exception as e:
+
+        print("Fehler:", e)
 
 with open(
     "fkm_detail_test.csv",
@@ -53,8 +72,9 @@ with open(
         fieldnames=[
             "MesseName",
             "Stadt",
-            "Land",
             "Termin",
+            "Status",
+            "HTML_Laenge",
             "DetailURL"
         ]
     )
@@ -62,4 +82,5 @@ with open(
     writer.writeheader()
     writer.writerows(rows)
 
+print()
 print("Exportiert:", len(rows))
