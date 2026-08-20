@@ -1,50 +1,50 @@
 import requests
-from bs4 import BeautifulSoup
 
 url = (
-    "https://www.auma.de/messen-finden/details/"
-    "?tfd=dusseldorf_psi_229475"
+    "https://www.auma.de/api/TradeFairData/"
+    "getWebOverviewTradeFairData"
+    "?intFilterYearFrom=2026"
+    "&intFilterYearTo=2032"
+    "&intFilterMonthFrom=1"
+    "&intFilterMonthTo=12"
+    "&strLanguage=de"
 )
 
-response = requests.get(
+data = requests.get(
     url,
-    headers={
-        "User-Agent": "Mozilla/5.0"
-    }
+    headers={"User-Agent": "Mozilla/5.0"}
+).json()
+
+fkm_fairs = []
+
+for fair in data:
+
+    if fair.get("blnFKM"):
+
+        detail_url = (
+            "https://www.auma.de/messen-finden/details/?tfd="
+            + fair["strUrlParameter"]
+        )
+
+        response = requests.get(
+            detail_url,
+            headers={"User-Agent": "Mozilla/5.0"}
+        )
+
+        fkm_fairs.append({
+            "Titel": fair["strTitel"],
+            "Status": response.status_code,
+            "URL": detail_url
+        })
+
+print("FKM-Seiten geprüft:", len(fkm_fairs))
+
+ok = sum(
+    1 for x in fkm_fairs
+    if x["Status"] == 200
 )
 
-soup = BeautifulSoup(
-    response.text,
-    "html.parser"
-)
+print("Status 200:", ok)
 
-text = soup.get_text("\n", strip=True)
-
-keywords = [
-    "Turnus:",
-    "Gründungsjahr:",
-    "Veranstalter",
-    "Zutritt",
-    "Aussteller",
-    "Besucher",
-    "Bruttofläche",
-    "Nettofläche"
-]
-
-for keyword in keywords:
-
-    print("\n" + "=" * 80)
-    print(keyword)
-    print("=" * 80)
-
-    pos = text.find(keyword)
-
-    if pos != -1:
-
-        start = max(0, pos - 200)
-        end = min(len(text), pos + 1000)
-
-        print(text[start:end])
-
-    else:
-        print("Nicht gefunden")
+for row in fkm_fairs[:20]:
+    print(row)
