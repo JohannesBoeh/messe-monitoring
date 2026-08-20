@@ -42,50 +42,33 @@ for fair in data:
     if not fair.get("blnFKM"):
         continue
 
-    detail_url = (
-        "https://www.auma.de/messen-finden/details/?tfd="
-        + fair["strUrlParameter"]
-    )
+    rows.append({
+        "Messe": fair.get("strTitel"),
+        "Jahr": "2026",
+        "Monat": fair.get("strTermin", "")[:2],
+        "Termin": fair.get("strTermin"),
+        "Stadt": city,
+        "Turnus": "",
+        "Besucherzahl": "",
+        "Ausstellerzahl": ""
+    })
 
-    try:
+    if len(rows) >= 10:
+        break
 
-        page = requests.get(
-            detail_url,
-            headers={"User-Agent": "Mozilla/5.0"},
-            timeout=30
-        )
+with open(
+    "AUMA_FKM_Messen.csv",
+    "w",
+    newline="",
+    encoding="utf-8-sig"
+) as file:
 
-        soup = BeautifulSoup(
-            page.text,
-            "html.parser"
-        )
-
-        text = soup.get_text("\n", strip=True)
-
-        lines = [
-            x.strip()
-            for x in text.split("\n")
-            if x.strip()
-        ]
-
-        turnus = ""
-
-        for i, line in enumerate(lines):
-            if line == "Turnus:":
-                if i + 1 < len(lines):
-                    turnus = lines[i + 1]
-                break
-
-        besucher = ""
-
-        for i, line in enumerate(lines):
-            if line == "Besucher (Zahl der Eintritte)":
-                if i + 1 < len(lines):
-                    besucher = lines[i + 1]
-                break
-
-        aussteller = ""
-
-        for i in range(len(lines) - 3):
-
-  
+    writer = csv.DictWriter(
+        file,
+        fieldnames=[
+            "Messe",
+            "Jahr",
+            "Monat",
+            "Termin",
+            "Stadt",
+            "
