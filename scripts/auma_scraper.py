@@ -1,6 +1,5 @@
 import requests
 import csv
-import re
 from bs4 import BeautifulSoup
 
 TARGET_CITIES = [
@@ -69,98 +68,24 @@ for fair in data:
             if x.strip()
         ]
 
-        # Standardwerte
         turnus = ""
-        besucher = ""
-        aussteller = ""
 
-        # Turnus suchen
         for i, line in enumerate(lines):
             if line == "Turnus:":
                 if i + 1 < len(lines):
                     turnus = lines[i + 1]
                 break
 
-        # Besucher suchen
+        besucher = ""
+
         for i, line in enumerate(lines):
             if line == "Besucher (Zahl der Eintritte)":
                 if i + 1 < len(lines):
                     besucher = lines[i + 1]
                 break
 
-        # Aussteller suchen
-        for i, line in enumerate(lines):
-            if (
-                line == "Aussteller"
-                and i + 1 < len(lines)
-                and re.match(r"^[0-9.]+$", lines[i + 1])
-            ):
-                aussteller = lines[i + 1]
-                break
+        aussteller = ""
 
-        termin = fair.get("strTermin", "")
+        for i in range(len(lines) - 3):
 
-        jahr = ""
-        monat = ""
-
-        match = re.search(r"(20\d{2})", termin)
-
-        if match:
-            jahr = match.group(1)
-
-        match = re.match(r"(\d{2})\.", termin)
-
-        if match:
-            monat = match.group(1)
-
-        rows.append({
-            "Messe": fair.get("strTitel"),
-            "Jahr": jahr,
-            "Monat": monat,
-            "Termin": termin,
-            "Stadt": city,
-            "Turnus": turnus,
-            "Besucherzahl": besucher,
-            "Ausstellerzahl": aussteller
-        })
-
-        print(
-            len(rows),
-            fair.get("strTitel")
-        )
-
-    except Exception as e:
-
-        print(
-            "FEHLER:",
-            fair.get("strTitel"),
-            e
-        )
-
-with open(
-    "AUMA_FKM_Messen.csv",
-    "w",
-    newline="",
-    encoding="utf-8-sig"
-) as file:
-
-    writer = csv.DictWriter(
-        file,
-        fieldnames=[
-            "Messe",
-            "Jahr",
-            "Monat",
-            "Termin",
-            "Stadt",
-            "Turnus",
-            "Besucherzahl",
-            "Ausstellerzahl"
-        ],
-        delimiter=";"
-    )
-
-    writer.writeheader()
-    writer.writerows(rows)
-
-print()
-print("Exportiert:", len(rows))
+  
