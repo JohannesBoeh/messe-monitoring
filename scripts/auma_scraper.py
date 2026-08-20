@@ -1,31 +1,36 @@
-import requests
+from playwright.sync_api import sync_playwright
 
-url = (
-    "https://www.auma.de/api/TradeFairData/"
-    "getWebOverviewTradeFairData"
-    "?intFilterYearFrom=2026"
-    "&intFilterYearTo=2032"
-    "&intFilterMonthFrom=1"
-    "&intFilterMonthTo=12"
-    "&strLanguage=de"
-)
+seen = set()
 
-response = requests.get(
-    url,
-    headers={"User-Agent": "Mozilla/5.0"}
-)
+def log_response(response):
 
-data = response.json()
+    url = response.url
 
-for fair in data[:20]:
+    if "/api/" in url and url not in seen:
 
-    print("=" * 80)
+        seen.add(url)
 
-    print("TITEL:")
-    print(fair.get("strTitel"))
+        print("\n" + "=" * 100)
+        print(url)
 
-    print("\nURL PARAMETER:")
-    print(fair.get("strUrlParameter"))
+with sync_playwright() as p:
 
-    print("\nKOMPLETTER DATENSATZ:")
-    print(fair)
+    browser = p.chromium.launch(headless=True)
+
+    page = browser.new_page()
+
+    page.on("response", log_response)
+
+    page.goto(
+        "https://www.auma.de/messen-finden/",
+        wait_until="networkidle"
+    )
+
+    page.goto(
+        "https://www.auma.de/messen-finden/messe/dusseldorf_psi_229475",
+        wait_until="networkidle"
+    )
+
+    page.wait_for_timeout(10000)
+
+    browser.close()
