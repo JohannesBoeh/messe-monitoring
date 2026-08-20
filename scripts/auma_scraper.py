@@ -1,40 +1,31 @@
-from playwright.sync_api import sync_playwright
+import requests
+from bs4 import BeautifulSoup
 
-with sync_playwright() as p:
+url = "https://www.auma.de/messen-finden/details/?tfd=dusseldorf_psi_229475"
 
-    browser = p.chromium.launch(headless=True)
+response = requests.get(
+    url,
+    headers={
+        "User-Agent": "Mozilla/5.0"
+    }
+)
 
-    page = browser.new_page()
+print("STATUS:")
+print(response.status_code)
 
-    page.goto(
-        "https://www.auma.de/messen-finden/",
-        wait_until="networkidle"
-    )
+print("\nFINAL URL:")
+print(response.url)
 
-    links = page.locator("a")
+soup = BeautifulSoup(
+    response.text,
+    "html.parser"
+)
 
-    print("Suche PSI-Links...\n")
+print("\nSEITENTITEL:")
+print(soup.title.text)
 
-    count = links.count()
+print("\nERSTE 10000 ZEICHEN:\n")
 
-    for i in range(count):
+text = soup.get_text("\n", strip=True)
 
-        try:
-
-            href = links.nth(i).get_attribute("href")
-            text = links.nth(i).inner_text().strip()
-
-            if "PSI" in text:
-
-                print("TEXT:")
-                print(text)
-
-                print("\nHREF:")
-                print(href)
-
-                print("\n" + "=" * 80)
-
-        except:
-            pass
-
-    browser.close()
+print(text[:10000])
