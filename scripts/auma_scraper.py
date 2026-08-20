@@ -1,41 +1,50 @@
 import requests
+from bs4 import BeautifulSoup
 
 url = (
-    "https://www.auma.de/api/TradeFairData/"
-    "getWebOverviewTradeFairData"
-    "?intFilterYearFrom=2026"
-    "&intFilterYearTo=2032"
-    "&intFilterMonthFrom=1"
-    "&intFilterMonthTo=12"
-    "&strLanguage=de"
+    "https://www.auma.de/messen-finden/details/"
+    "?tfd=dusseldorf_psi_229475"
 )
 
-data = requests.get(
+response = requests.get(
     url,
-    headers={"User-Agent": "Mozilla/5.0"}
-).json()
+    headers={
+        "User-Agent": "Mozilla/5.0"
+    }
+)
 
-count = 0
+soup = BeautifulSoup(
+    response.text,
+    "html.parser"
+)
 
-for fair in data:
+text = soup.get_text("\n", strip=True)
 
-    if fair.get("blnFKM"):
+keywords = [
+    "Turnus:",
+    "Gründungsjahr:",
+    "Veranstalter",
+    "Zutritt",
+    "Aussteller",
+    "Besucher",
+    "Bruttofläche",
+    "Nettofläche"
+]
 
-        detail_url = (
-            "https://www.auma.de/messen-finden/details/?tfd="
-            + fair["strUrlParameter"]
-        )
+for keyword in keywords:
 
-        response = requests.get(
-            detail_url,
-            headers={"User-Agent": "Mozilla/5.0"}
-        )
+    print("\n" + "=" * 80)
+    print(keyword)
+    print("=" * 80)
 
-        print("=" * 80)
-        print(fair["strTitel"])
-        print("Status:", response.status_code)
+    pos = text.find(keyword)
 
-        count += 1
+    if pos != -1:
 
-        if count >= 20:
-            break
+        start = max(0, pos - 200)
+        end = min(len(text), pos + 1000)
+
+        print(text[start:end])
+
+    else:
+        print("Nicht gefunden")
