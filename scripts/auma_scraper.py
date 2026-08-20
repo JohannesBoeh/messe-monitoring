@@ -54,10 +54,7 @@ for fair in data:
             "Seitenlaenge": len(text)
         })
 
-        print(
-            f"{len(rows)} | "
-            f"{fair.get('strTitel')}"
-        )
+        print(f"{len(rows)} | {fair.get('strTitel')}")
 
         count += 1
 
@@ -65,6 +62,7 @@ for fair in data:
             break
 
     except Exception as e:
+
         print("FEHLER:", e)
 
 with open(
@@ -76,4 +74,9 @@ with open(
 
     writer = csv.DictWriter(
         file,
-  
+        fieldnames=[
+            "MesseName",
+            "Stadt",
+            "Termin",
+            "DetailURL",
+            "Seitenlaenge"
