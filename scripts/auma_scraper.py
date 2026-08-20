@@ -1,23 +1,40 @@
-import requests
+from playwright.sync_api import sync_playwright
 
-url = "https://www.auma.de/messen-finden/messe/dusseldorf_psi_229475"
+with sync_playwright() as p:
 
-response = requests.get(
-    url,
-    headers={
-        "User-Agent": "Mozilla/5.0"
-    }
-)
+    browser = p.chromium.launch(headless=True)
 
-print("URL:")
-print(url)
+    page = browser.new_page()
 
-print("\nStatus:")
-print(response.status_code)
+    page.goto(
+        "https://www.auma.de/messen-finden/",
+        wait_until="networkidle"
+    )
 
-print("\nFinal URL:")
-print(response.url)
+    links = page.locator("a")
 
-print("\nErste 5000 Zeichen:\n")
+    print("Suche PSI-Links...\n")
 
-print(response.text[:5000])
+    count = links.count()
+
+    for i in range(count):
+
+        try:
+
+            href = links.nth(i).get_attribute("href")
+            text = links.nth(i).inner_text().strip()
+
+            if "PSI" in text:
+
+                print("TEXT:")
+                print(text)
+
+                print("\nHREF:")
+                print(href)
+
+                print("\n" + "=" * 80)
+
+        except:
+            pass
+
+    browser.close()
