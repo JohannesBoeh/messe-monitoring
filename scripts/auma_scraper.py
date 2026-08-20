@@ -1,34 +1,85 @@
-from playwright.sync_api import sync_playwright
+import requests
+import csv
 
-seen = set()
+TARGET_CITIES = [
+    "Berlin",
+    "Düsseldorf",
+    "Frankfurt",
+    "Hamburg",
+    "Köln",
+    "Leipzig",
+    "München",
+    "Stuttgart"
+]
 
-def log_response(response):
+url = (
+    "https://www.auma.de/api/TradeFairData/"
+    "getWebOverviewTradeFairData"
+    "?intFilterYearFrom=2026"
+    "&intFilterYearTo=2032"
+    "&intFilterMonthFrom=1"
+    "&intFilterMonthTo=12"
+    "&strLanguage=de"
+)
 
-    url = response.url
+response = requests.get(
+    url,
+    headers={"User-Agent": "Mozilla/5.0"}
+)
 
-    if "/api/" in url and url not in seen:
-        seen.add(url)
+data = response.json()
 
-        print("\n" + "=" * 100)
-        print(url)
+rows = []
 
-with sync_playwright() as p:
+for fair in data:
 
-    browser = p.chromium.launch(headless=True)
+    city = fair.get("strStadt", "")
 
-    page = browser.new_page()
+    if any(target in city for target in TARGET_CITIES):
 
-    page.on("response", log_response)
+        rows.append({
+            "MesseID": fair.get("strMesseTerminKey"),
+            "MesseName": fair.get("strTitel"),
+            "Termin": fair.get("strTermin"),
+            "Stadt": fair.get("strStadt"),
+            "Land": fair.get("strLand"),
+            "Kategorie": fair.get("strKategorie"),
+            "Foerderung": fair.get("strFoerderung"),
+            "FKM": fair.get("blnFKM"),
+            "DE": fair.get("blnDE"),
+            "HE": fair.get("blnHE"),
+            "WAN": fair.get("blnWAN"),
+            "GTQ": fair.get("blnGTQ"),
+            "UrlParameter": fair.get("strUrlParameter")
+        })
 
-    page.goto(
-        "https://www.auma.de/messen-finden/",
-        wait_until="networkidle"
+with open(
+    "a_standorte.csv",
+    "w",
+    newline="",
+    encoding="utf-8"
+) as file:
+
+    writer = csv.DictWriter(
+        file,
+        fieldnames=[
+            "MesseID",
+            "MesseName",
+            "Termin",
+            "Stadt",
+            "Land",
+            "Kategorie",
+            "Foerderung",
+            "FKM",
+            "DE",
+            "HE",
+            "WAN",
+            "GTQ",
+            "UrlParameter"
+        ]
     )
 
-    page.wait_for_timeout(3000)
+    writer.writeheader()
+    writer.writerows(rows)
 
-    body = page.locator("body").inner_text()
-
-    print(body[:5000])
-
-    browser.close()
+print("Exportierte Datensätze:", len(rows))
