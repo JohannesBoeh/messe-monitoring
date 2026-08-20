@@ -1,5 +1,6 @@
 import requests
 import csv
+from bs4 import BeautifulSoup
 
 API_URL = (
     "https://www.auma.de/api/TradeFairData/"
@@ -30,35 +31,34 @@ for fair in data:
         + fair["strUrlParameter"]
     )
 
-    try:
+    page = requests.get(
+        detail_url,
+        headers={"User-Agent": "Mozilla/5.0"},
+        timeout=30
+    )
 
-        page = requests.get(
-            detail_url,
-            headers={"User-Agent": "Mozilla/5.0"},
-            timeout=30
-        )
+    soup = BeautifulSoup(
+        page.text,
+        "html.parser"
+    )
 
-        rows.append({
-            "MesseName": fair.get("strTitel"),
-            "Stadt": fair.get("strStadt"),
-            "Termin": fair.get("strTermin"),
-            "Status": page.status_code,
-            "HTML_Laenge": len(page.text),
-            "DetailURL": detail_url
-        })
+    text = soup.get_text("\n", strip=True)
 
-        print(
-            f"{len(rows)} | "
-            f"{fair.get('strTitel')} | "
-            f"{page.status_code}"
-        )
+    rows.append({
+        "MesseName": fair.get("strTitel"),
+        "Stadt": fair.get("strStadt"),
+        "Termin": fair.get("strTermin"),
+        "DetailURL": detail_url,
+        "TextLaenge": len(text)
+    })
 
-        if len(rows) >= 10:
-            break
+    print(
+        f"{len(rows)} | "
+        f"{fair.get('strTitel')}"
+    )
 
-    except Exception as e:
-
-        print("Fehler:", e)
+    if len(rows) >= 10:
+        break
 
 with open(
     "fkm_detail_test.csv",
@@ -73,9 +73,8 @@ with open(
             "MesseName",
             "Stadt",
             "Termin",
-            "Status",
-            "HTML_Laenge",
-            "DetailURL"
+            "DetailURL",
+            "TextLaenge"
         ]
     )
 
