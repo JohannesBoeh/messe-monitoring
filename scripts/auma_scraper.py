@@ -78,7 +78,26 @@ OUTPUT_FIELDS = [
     "Zutritt", "Turnus", "Veranstalter",
     "FKM_Zertifiziert", "Detail_URL",
 ]
-
+82| # ---------------------------------------------------------------------------
+83| # Request Session mit Retry-Logik
+84| # ---------------------------------------------------------------------------
+85| 
+86| def get_session_with_retries():
+87|     """Sessions-Pool mit automatischem Retry bei transienten Fehlern"""
+88|     session = requests.Session()
+89|     retry_strategy = Retry(
+90|         total=3,                              # 3 Versuche insgesamt
+91|         status_forcelist=[429, 500, 502, 503, 504],  # Bei diesen Status-Codes
+92|         allowed_methods=["GET"],              # Nur GET (sicher)
+93|         backoff_factor=1                      # 1s, 2s, 4s Pause zwischen Versuchen
+94|     )
+95|     adapter = HTTPAdapter(max_retries=retry_strategy)
+96|     session.mount("http://", adapter)
+97|     session.mount("https://", adapter)
+98|     return session
+99| 
+100| # Globale Session mit Retry-Logik
+101| SESSION = get_session_with_retries()
 OVERVIEW_API = (
     "https://www.auma.de/api/TradeFairData/getWebOverviewTradeFairData"
     "?intFilterYearFrom={yf}&intFilterYearTo={yt}"
