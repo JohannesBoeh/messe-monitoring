@@ -1,23 +1,31 @@
 import requests
 
-url_parameter = "dusseldorf_psi_229475"
-
-detail_url = (
-    f"https://www.auma.de/messen-finden/details/"
-    f"{url_parameter}"
+url = (
+    "https://www.auma.de/api/TradeFairData/"
+    "getWebOverviewTradeFairData"
+    "?intFilterYearFrom=2026"
+    "&intFilterYearTo=2032"
+    "&intFilterMonthFrom=1"
+    "&intFilterMonthTo=12"
+    "&strLanguage=de"
 )
 
 response = requests.get(
-    detail_url,
+    url,
     headers={"User-Agent": "Mozilla/5.0"}
 )
 
-print("URL:")
-print(detail_url)
+data = response.json()
 
-print("\nSTATUS:")
-print(response.status_code)
+for fair in data[:20]:
 
-print("\nERSTE 3000 ZEICHEN:\n")
+    print("=" * 80)
 
-print(response.text[:3000])
+    print("TITEL:")
+    print(fair.get("strTitel"))
+
+    print("\nURL PARAMETER:")
+    print(fair.get("strUrlParameter"))
+
+    print("\nKOMPLETTER DATENSATZ:")
+    print(fair)
