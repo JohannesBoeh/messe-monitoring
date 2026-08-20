@@ -27,15 +27,24 @@ Run:
                           [--output AUMA_FKM_Messen.csv]
 """
 
-import argparse
-import csv
-import json
-import re
-import time
-from pathlib import Path
-
-import requests
-from bs4 import BeautifulSoup
+30| import argparse
+31| import csv
+32| import json
+33| import logging
+34| import re
+35| import time
+36| from pathlib import Path
+37| 
+38| import requests
+39| from bs4 import BeautifulSoup
+40| 
+41| # Setup logging
+42| logger = logging.getLogger(__name__)
+43| logging.basicConfig(
+44|     level=logging.INFO,
+45|     format='%(asctime)s | %(levelname)-8s | %(message)s',
+45|     datefmt='%Y-%m-%d %H:%M:%S'
+46| )
 
 # ---------------------------------------------------------------------------
 # Config
