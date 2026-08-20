@@ -7,7 +7,6 @@ def log_response(response):
     url = response.url
 
     if "/api/" in url and url not in seen:
-
         seen.add(url)
 
         print("\n" + "=" * 100)
@@ -26,11 +25,10 @@ with sync_playwright() as p:
         wait_until="networkidle"
     )
 
-    page.goto(
-        "https://www.auma.de/messen-finden/messe/dusseldorf_psi_229475",
-        wait_until="networkidle"
-    )
+    page.wait_for_timeout(3000)
 
-    page.wait_for_timeout(10000)
+    body = page.locator("body").inner_text()
+
+    print(body[:5000])
 
     browser.close()
