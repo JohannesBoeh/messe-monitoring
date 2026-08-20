@@ -1,41 +1,45 @@
 import requests
+from bs4 import BeautifulSoup
 
-url = (
-    "https://www.auma.de/api/TradeFairData/"
-    "getWebOverviewTradeFairData"
-    "?intFilterYearFrom=2026"
-    "&intFilterYearTo=2032"
-    "&intFilterMonthFrom=1"
-    "&intFilterMonthTo=12"
-    "&strLanguage=de"
+detail_url = (
+    "https://www.auma.de/messen-finden/details/"
+    "?tfd=dusseldorf_psi_229475"
 )
 
-data = requests.get(
-    url,
+response = requests.get(
+    detail_url,
     headers={"User-Agent": "Mozilla/5.0"}
-).json()
-
-fkm_count = sum(
-    1 for fair in data
-    if fair.get("blnFKM")
 )
 
-print("FKM-Messen:")
-print(fkm_count)
+soup = BeautifulSoup(response.text, "html.parser")
 
-print("\nERSTE 10:\n")
+text = soup.get_text("\n", strip=True)
 
-counter = 0
+lines = []
 
-for fair in data:
+for line in text.split("\n"):
 
-    if fair.get("blnFKM"):
+    line = line.strip()
 
-        print(fair["strTitel"])
-        print(fair["strUrlParameter"])
-        print()
+    if line:
+        lines.append(line)
 
-        counter += 1
+for i, line in enumerate(lines):
 
-        if counter >= 10:
-            break
+    if line in [
+        "Turnus:",
+        "Gründungsjahr:",
+        "Veranstalter",
+        "Zutritt",
+        "Aussteller",
+        "Besucher",
+        "Bruttofläche",
+        "Nettofläche"
+    ]:
+
+        print("\n" + "=" * 80)
+        print(line)
+        print("=" * 80)
+
+        for x in lines[i:i+20]:
+            print(x)
