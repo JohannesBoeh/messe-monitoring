@@ -1,28 +1,74 @@
-name: Messe Monitoring
+# Save this file as: .github/workflows/auma_scraper.yml
+# Place auma_scraper.py in: scripts/auma_scraper.py
+
+name: AUMA Messe Monitoring
 
 on:
+  # Run automatically every Monday at 06:00 UTC
+  schedule:
+    - cron: "0 6 * * 1"
+
+  # Also allow manual trigger with custom parameters
   workflow_dispatch:
+    inputs:
+      year_from:
+        description: "Start year"
+        required: false
+        default: "2026"
+      year_to:
+        description: "End year"
+        required: false
+        default: "2032"
+      include_non_fkm:
+        description: "Include non-FKM fairs? (true/false)"
+        required: false
+        default: "false"
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install dependencies
+        run: pip install requests
+
+      - name: Run AUMA scraper
         run: |
-          pip install requests beautifulsoup4
+          YEAR_FROM="${{ github.event.inputs.year_from || '2026' }}"
+          YEAR_TO="${{ github.event.inputs.year_to || '2032' }}"
+          EXTRA=""
+          if [ "${{ github.event.inputs.include_non_fkm }}" = "true" ]; then
+            EXTRA="--include-non-fkm"
+          fi
+          python scripts/auma_scraper.py \
+            --year-from "$YEAR_FROM" \
+            --year-to "$YEAR_TO" \
+            --output AUMA_FKM_Messen.csv \
+            $EXTRA
 
-      - name: Run scraper
-        run: python scripts/auma_scraper.py
-
-      - name: Upload CSV
+      - name: Upload CSV as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AUMA-FKM-Messen
+          name: AUMA-FKM-Messen-${{ github.run_id }}
           path: AUMA_FKM_Messen.csv
+          retention-days: 90
+
+      # Optional: commit the CSV back to the repo so it's always up to date
+      - name: Commit updated CSV to repo
+        if: github.event_name == 'schedule'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add AUMA_FKM_Messen.csv
+          git diff --cached --quiet || git commit -m "chore: update AUMA data $(date -u +%Y-%m-%d)"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
