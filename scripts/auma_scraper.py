@@ -1,85 +1,33 @@
 import requests
-import csv
 from bs4 import BeautifulSoup
 
-API_URL = (
-    "https://www.auma.de/api/TradeFairData/"
-    "getWebOverviewTradeFairData"
-    "?intFilterYearFrom=2026"
-    "&intFilterYearTo=2032"
-    "&intFilterMonthFrom=1"
-    "&intFilterMonthTo=12"
-    "&strLanguage=de"
-)
+url = "https://www.auma.de/messen-finden/details/?tfd=dusseldorf_psi_229475"
 
 response = requests.get(
-    API_URL,
+    url,
     headers={"User-Agent": "Mozilla/5.0"}
 )
 
-data = response.json()
+soup = BeautifulSoup(response.text, "html.parser")
 
-rows = []
+text = soup.get_text("\n", strip=True)
 
-for fair in data:
+lines = [
+    line.strip()
+    for line in text.split("\n")
+    if line.strip()
+]
 
-    if not fair.get("blnFKM"):
-        continue
+for i, line in enumerate(lines):
 
-    detail_url = (
-        "https://www.auma.de/messen-finden/details/?tfd="
-        + fair["strUrlParameter"]
-    )
+    if line == "Turnus:":
+        print("\nTURNUS")
+        print(lines[i:i+5])
 
-    page = requests.get(
-        detail_url,
-        headers={"User-Agent": "Mozilla/5.0"},
-        timeout=30
-    )
+    if line == "Besucher (Zahl der Eintritte)":
+        print("\nBESUCHER")
+        print(lines[i:i+10])
 
-    soup = BeautifulSoup(
-        page.text,
-        "html.parser"
-    )
-
-    text = soup.get_text("\n", strip=True)
-
-    rows.append({
-        "MesseName": fair.get("strTitel"),
-        "Stadt": fair.get("strStadt"),
-        "Termin": fair.get("strTermin"),
-        "DetailURL": detail_url,
-        "TextLaenge": len(text)
-    })
-
-    print(
-        f"{len(rows)} | "
-        f"{fair.get('strTitel')}"
-    )
-
-    if len(rows) >= 10:
-        break
-
-with open(
-    "fkm_detail_test.csv",
-    "w",
-    newline="",
-    encoding="utf-8"
-) as file:
-
-    writer = csv.DictWriter(
-        file,
-        fieldnames=[
-            "MesseName",
-            "Stadt",
-            "Termin",
-            "DetailURL",
-            "TextLaenge"
-        ]
-    )
-
-    writer.writeheader()
-    writer.writerows(rows)
-
-print()
-print("Exportiert:", len(rows))
+    if line == "Aussteller":
+        print("\nAUSSTELLER")
+        print(lines[i:i+10])
