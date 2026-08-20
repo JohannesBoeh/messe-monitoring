@@ -16,8 +16,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4 playwright
-          python -m playwright install chromium
+          pip install requests beautifulsoup4
 
       - name: Run scraper
         run: python scripts/auma_scraper.py
@@ -25,5 +24,5 @@ jobs:
       - name: Upload CSV
         uses: actions/upload-artifact@v4
         with:
-          name: fkm-detail-test
-          path: fkm_detail_test.csv
+          name: AUMA-FKM-Messen
+          path: AUMA_FKM_Messen.csv
